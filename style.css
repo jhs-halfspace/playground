@@ -1,0 +1,416 @@
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ffffff;
+  color: #1a1a1b;
+  /* safe-area-inset accounts for the iPhone notch / home bar */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #d3d6da;
+  padding: 12px 16px;
+  position: relative;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.header-btn {
+  position: absolute;
+  left: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #1a1a1b;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============================================================
+   SCREENS - only one is visible at a time
+   ============================================================ */
+
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 20px 16px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ============================================================
+   HOME SCREEN - Game selection cards
+   ============================================================ */
+
+.game-card {
+  width: 100%;
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 2px solid #d3d6da;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.game-card:hover,
+.game-card:active {
+  border-color: #538d4e;
+  box-shadow: 0 2px 8px rgba(83, 141, 78, 0.15);
+}
+
+.game-card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.game-card p {
+  color: #787c7e;
+  font-size: 0.95rem;
+}
+
+/* ============================================================
+   WORDLE
+   ============================================================ */
+
+/* The board is a 5-column grid, one row per guess */
+#wordle-board {
+  display: grid;
+  grid-template-columns: repeat(5, 58px);
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.wordle-tile {
+  width: 58px;
+  height: 58px;
+  border: 2px solid #d3d6da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: transform 0.1s;
+}
+
+/* When a letter is typed but not yet submitted */
+.wordle-tile.filled {
+  border-color: #878a8c;
+  animation: pop 0.1s ease;
+}
+
+@keyframes pop {
+  50% { transform: scale(1.1); }
+}
+
+/* After submission - color reveals */
+.wordle-tile.correct {
+  background: #6aaa64;
+  border-color: #6aaa64;
+  color: white;
+}
+
+.wordle-tile.present {
+  background: #c9b458;
+  border-color: #c9b458;
+  color: white;
+}
+
+.wordle-tile.absent {
+  background: #787c7e;
+  border-color: #787c7e;
+  color: white;
+}
+
+/* Flip animation for revealing letters */
+.wordle-tile.reveal {
+  animation: flip 0.5s ease forwards;
+}
+
+@keyframes flip {
+  0%   { transform: rotateX(0); }
+  50%  { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+/* Message area (win/lose text) */
+#wordle-message {
+  min-height: 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* On-screen keyboard */
+#wordle-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 484px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.key {
+  height: 52px;
+  min-width: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background: #d3d6da;
+  color: #1a1a1b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+
+.key.wide {
+  min-width: 56px;
+  font-size: 0.75rem;
+}
+
+.key.correct {
+  background: #6aaa64;
+  color: white;
+}
+
+.key.present {
+  background: #c9b458;
+  color: white;
+}
+
+.key.absent {
+  background: #787c7e;
+  color: white;
+}
+
+/* ============================================================
+   CONNECTIONS
+   ============================================================ */
+
+#connections-solved {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.solved-group {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  color: white;
+  font-weight: 600;
+}
+
+.solved-group .group-name {
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+}
+
+.solved-group .group-words {
+  font-size: 0.95rem;
+}
+
+/* Difficulty colors matching NYT Connections */
+.difficulty-0 { background: #f9df6d; color: #1a1a1b; } /* yellow - easiest */
+.difficulty-1 { background: #a0c35a; }                   /* green */
+.difficulty-2 { background: #b0c4ef; color: #1a1a1b; } /* blue */
+.difficulty-3 { background: #ba81c5; }                   /* purple - hardest */
+
+#connections-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.conn-tile {
+  padding: 16px 8px;
+  border: none;
+  border-radius: 8px;
+  background: #efefe6;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, transform 0.1s;
+  word-break: break-word;
+}
+
+.conn-tile.selected {
+  background: #5a594e;
+  color: white;
+  transform: scale(0.97);
+}
+
+.conn-tile:active {
+  transform: scale(0.95);
+}
+
+#connections-mistakes {
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  text-align: center;
+  min-height: 24px;
+}
+
+#connections-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ctrl-btn {
+  padding: 10px 24px;
+  border-radius: 24px;
+  border: 1px solid #1a1a1b;
+  background: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-btn.primary {
+  background: #1a1a1b;
+  color: white;
+}
+
+.ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ============================================================
+   SHARED
+   ============================================================ */
+
+/* ============================================================
+   LOGIN GATE
+   ============================================================ */
+
+#login-screen {
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.login-box h2 {
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.login-subtitle {
+  color: #787c7e;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#login-form input {
+  padding: 12px 16px;
+  border: 2px solid #d3d6da;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#login-form input:focus {
+  border-color: #538d4e;
+}
+
+.login-btn {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #538d4e;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.login-error {
+  color: #e03131;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+/* ============================================================
+   SHARED
+   ============================================================ */
+
+.new-game-btn {
+  margin-top: 12px;
+  padding: 12px 32px;
+  border-radius: 24px;
+  border: none;
+  background: #538d4e;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
