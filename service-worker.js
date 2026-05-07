@@ -46,12 +46,20 @@ self.addEventListener('activate', event => {
 });
 
 // FETCH event: fires for every network request the app makes.
-// Strategy: "cache first, fall back to network"
-// - If we have the file cached, serve it instantly (fast, works offline)
-// - If not cached, fetch from network (for anything we forgot to cache)
+// Strategy: "network first, fall back to cache"
+// - Try the network first (always get the latest version)
+// - If network fails (offline), serve from cache
+// - Update the cache with every successful network response
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // Clone the response - a response can only be consumed once,
+        // and we need it both for the cache and to return to the browser.
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
