@@ -367,5 +367,113 @@ const CONNECTIONS_PUZZLES = [
       { name: 'Candy brands', words: ['CHARMS', 'KINDER', 'WONKA', 'YORK'], difficulty: 2 },
       { name: 'Free ___', words: ['BIRD', 'FALL', 'SOLO', 'WILLY'], difficulty: 3 }
     ]
+  },
+  {
+    id: 19,
+    groups: [
+      { name: 'Herbs', words: ['BASIL', 'DILL', 'SAGE', 'THYME'], difficulty: 0 },
+      { name: 'Poker terms', words: ['BLUFF', 'CALL', 'FOLD', 'RAISE'], difficulty: 1 },
+      { name: 'Shades of red', words: ['BRICK', 'CRIMSON', 'MAROON', 'RUST'], difficulty: 2 },
+      { name: '___ bar', words: ['CANDY', 'CROW', 'HANDLE', 'SPACE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 20,
+    groups: [
+      { name: 'Containers', words: ['BARREL', 'CHEST', 'CRATE', 'TRUNK'], difficulty: 0 },
+      { name: 'Parts of a shoe', words: ['HEEL', 'LACE', 'SOLE', 'TONGUE'], difficulty: 1 },
+      { name: 'Film festivals', words: ['CANNES', 'SUNDANCE', 'TRIBECA', 'VENICE'], difficulty: 2 },
+      { name: '___stone', words: ['CORNER', 'GRIND', 'LIME', 'MILE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 21,
+    groups: [
+      { name: 'Enthusiast', words: ['BUFF', 'FAN', 'FIEND', 'NUT'], difficulty: 0 },
+      { name: 'Also a bird', words: ['CRANE', 'MARTIN', 'ROBIN', 'SWIFT'], difficulty: 1 },
+      { name: 'Capital cities', words: ['LIMA', 'OSLO', 'ROME', 'SOFIA'], difficulty: 2 },
+      { name: '___work', words: ['CLOCK', 'DREAM', 'FOOT', 'FRAME'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 22,
+    groups: [
+      { name: 'Quick look', words: ['GLANCE', 'GLIMPSE', 'PEEK', 'SCAN'], difficulty: 0 },
+      { name: 'Ship parts', words: ['BOW', 'HULL', 'MAST', 'STERN'], difficulty: 1 },
+      { name: 'Things with layers', words: ['CAKE', 'EARTH', 'LASAGNA', 'PARFAIT'], difficulty: 2 },
+      { name: '___ out', words: ['BLACK', 'CHECK', 'FREAK', 'PHASE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 23,
+    groups: [
+      { name: 'Nonsense', words: ['BUNK', 'DRIVEL', 'HOGWASH', 'TRIPE'], difficulty: 0 },
+      { name: 'Car parts', words: ['BUMPER', 'CLUTCH', 'FENDER', 'HOOD'], difficulty: 1 },
+      { name: 'Types of cloud', words: ['CIRRUS', 'CUMULUS', 'NIMBUS', 'STRATUS'], difficulty: 2 },
+      { name: '___mate', words: ['CHECK', 'CLASS', 'ROOM', 'SOUL'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 24,
+    groups: [
+      { name: 'Things in a gym', words: ['BENCH', 'MAT', 'RACK', 'RING'], difficulty: 0 },
+      { name: 'Textures', words: ['COARSE', 'ROUGH', 'SMOOTH', 'VELVET'], difficulty: 1 },
+      { name: 'Famous pairs (one half)', words: ['CLYDE', 'GARFUNKEL', 'HARDY', 'ROBIN'], difficulty: 2 },
+      { name: '___berry', words: ['BLACK', 'BLUE', 'GOOSE', 'STRAW'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 25,
+    groups: [
+      { name: 'Abandon', words: ['DESERT', 'DITCH', 'DROP', 'DUMP'], difficulty: 0 },
+      { name: 'Chess pieces', words: ['BISHOP', 'KING', 'KNIGHT', 'PAWN'], difficulty: 1 },
+      { name: 'Mythical creatures', words: ['DRAGON', 'GRIFFIN', 'PHOENIX', 'UNICORN'], difficulty: 2 },
+      { name: '___fish', words: ['CAT', 'JELLY', 'STAR', 'SWORD'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 26,
+    groups: [
+      { name: 'Annoy', words: ['BUG', 'GRATE', 'IRK', 'NEEDLE'], difficulty: 0 },
+      { name: 'Types of market', words: ['BEAR', 'BULL', 'FLEA', 'STOCK'], difficulty: 1 },
+      { name: 'Awards', words: ['EMMY', 'GRAMMY', 'OSCAR', 'TONY'], difficulty: 2 },
+      { name: '___board', words: ['CARD', 'CUP', 'DART', 'SKATE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 27,
+    groups: [
+      { name: 'Types of roll', words: ['DRUM', 'EGG', 'ROCK', 'SPRING'], difficulty: 0 },
+      { name: 'Things in a wallet', words: ['CARD', 'CASH', 'PHOTO', 'RECEIPT'], difficulty: 1 },
+      { name: 'Impressive', words: ['EPIC', 'GRAND', 'MIGHTY', 'STELLAR'], difficulty: 2 },
+      { name: '___ house', words: ['DOLL', 'GREEN', 'PEN', 'POWER'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 28,
+    groups: [
+      { name: 'Throw', words: ['CHUCK', 'HURL', 'PITCH', 'TOSS'], difficulty: 0 },
+      { name: 'Parts of a river', words: ['BANK', 'BED', 'DELTA', 'MOUTH'], difficulty: 1 },
+      { name: 'Space terms', words: ['COMET', 'METEOR', 'ORBIT', 'QUASAR'], difficulty: 2 },
+      { name: '___land', words: ['FIN', 'ICE', 'IRE', 'NETHER'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 29,
+    groups: [
+      { name: 'Catch', words: ['NAB', 'NET', 'SNAG', 'TRAP'], difficulty: 0 },
+      { name: 'Math terms', words: ['FACTOR', 'MEDIAN', 'PRIME', 'ROOT'], difficulty: 1 },
+      { name: 'James Bond actors', words: ['BROSNAN', 'CONNERY', 'CRAIG', 'MOORE'], difficulty: 2 },
+      { name: '___line', words: ['DEAD', 'HEAD', 'PUNCH', 'TAG'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 30,
+    groups: [
+      { name: 'Things that are pitched', words: ['BALL', 'IDEA', 'SONG', 'TENT'], difficulty: 0 },
+      { name: 'Animal sounds', words: ['BARK', 'CHIRP', 'GROWL', 'HISS'], difficulty: 1 },
+      { name: 'Paint types', words: ['ACRYLIC', 'ENAMEL', 'LATEX', 'MATTE'], difficulty: 2 },
+      { name: '___cake', words: ['CUP', 'HOT', 'PAN', 'SHORT'], difficulty: 3 }
+    ]
   }
 ];

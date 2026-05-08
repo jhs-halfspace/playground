@@ -222,7 +222,6 @@ const Connections = (() => {
       });
 
       mistakes++;
-      selected.clear();
       renderBoard();
       renderMistakes();
 
