@@ -247,6 +247,12 @@ header h1 {
   text-align: center;
   color: white;
   font-weight: 600;
+  animation: groupReveal 0.3s ease;
+}
+
+@keyframes groupReveal {
+  from { opacity: 0; transform: scaleY(0.8); }
+  to { opacity: 1; transform: scaleY(1); }
 }
 
 .solved-group .group-name {
@@ -296,6 +302,32 @@ header h1 {
 
 .conn-tile:active {
   transform: scale(0.95);
+}
+
+/* Shake animation for wrong guesses */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  12.5% { transform: translateX(-6px); }
+  25% { transform: translateX(6px); }
+  37.5% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  62.5% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+  87.5% { transform: translateX(-2px); }
+}
+
+.conn-tile.shake {
+  animation: shake 0.6s ease;
+}
+
+/* Flying tiles during correct guess animation */
+.conn-tile-flying {
+  pointer-events: none;
+  transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.3s ease 0.15s;
 }
 
 #connections-mistakes {
@@ -370,10 +402,11 @@ header h1 {
 }
 
 /* ============================================================
-   CONNECTIONS PUZZLE PICKER
+   PUZZLE PICKER (shared by Wordle & Connections)
    ============================================================ */
 
-#connections-picker {
+#connections-picker,
+#wordle-picker {
   width: 100%;
 }
 
@@ -385,9 +418,10 @@ header h1 {
   color: #787c7e;
 }
 
-#connections-puzzle-grid {
+#connections-puzzle-grid,
+#wordle-puzzle-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   width: 100%;
 }
@@ -426,7 +460,19 @@ header h1 {
   color: #6aaa64;
 }
 
-#connections-game {
+.puzzle-pick-btn.played {
+  background: #fef3e0;
+  border-color: #c9b458;
+}
+
+.puzzle-pick-btn.played::after {
+  content: '\2717';
+  font-size: 0.8rem;
+  color: #c9b458;
+}
+
+#connections-game,
+#wordle-game {
   width: 100%;
   display: flex;
   flex-direction: column;

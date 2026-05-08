@@ -63,4 +63,11 @@ document.querySelectorAll('.game-card').forEach(card => {
   });
 });
 
-backBtn.addEventListener('click', () => showScreen('home'));
+backBtn.addEventListener('click', () => {
+  // If inside a connections puzzle, go back to the puzzle picker first
+  if (screens.connections.classList.contains('active') && Connections.isInGame()) {
+    Connections.showPicker();
+    return;
+  }
+  showScreen('home');
+});

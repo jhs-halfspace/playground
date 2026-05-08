@@ -1,6 +1,6 @@
 // Version this cache so we can force updates when we deploy new code.
 // Change this string whenever you update the app files.
-const CACHE_NAME = 'word-games-v2';
+const CACHE_NAME = 'word-games-v3';
 
 // List every file the app needs to work offline.
 // The service worker will download and cache all of these on first visit.

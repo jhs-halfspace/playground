@@ -18,6 +18,7 @@ const Connections = (() => {
   let mistakes = 0;
   let maxMistakes = 4;
   let gameOver = false;
+  let animating = false;    // True during correct-guess animation
   let remainingWords = [];  // Words still on the board
 
   // DOM references
@@ -76,9 +77,17 @@ const Connections = (() => {
   }
 
   function showPicker() {
+    // Clean up any flying tiles from interrupted animations
+    document.querySelectorAll('.conn-tile-flying').forEach(c => c.remove());
+    animating = false;
+
     gameEl.classList.add('hidden');
     pickerEl.classList.remove('hidden');
     renderPicker();
+  }
+
+  function isInGame() {
+    return gameEl && !gameEl.classList.contains('hidden');
   }
 
   function startPuzzle(id) {
@@ -96,6 +105,7 @@ const Connections = (() => {
     solved = [];
     mistakes = 0;
     gameOver = false;
+    animating = false;
 
     newGameBtn.classList.add('hidden');
     submitBtn.disabled = true;
@@ -188,7 +198,7 @@ const Connections = (() => {
   }
 
   function submitGuess() {
-    if (selected.size !== 4 || gameOver) return;
+    if (selected.size !== 4 || gameOver || animating) return;
 
     const selectedArr = [...selected];
 
@@ -199,21 +209,69 @@ const Connections = (() => {
     });
 
     if (matchedGroup) {
-      // Correct!
-      solved.push(matchedGroup);
-      renderSolvedGroup(matchedGroup);
+      // Correct! Animate tiles flying to solved area
+      animating = true;
 
-      // Remove solved words from the board
-      remainingWords = remainingWords.filter(w => !selected.has(w));
-      selected.clear();
-      renderBoard();
-      renderMistakes();
+      const selectedTiles = Array.from(boardEl.querySelectorAll('.conn-tile.selected'));
+      const tileRects = selectedTiles.map(t => t.getBoundingClientRect());
+      const solvedRect = solvedEl.getBoundingClientRect();
 
-      // Check if all groups found
-      if (solved.length === 4) {
-        endGame(true);
-      }
+      // Create flying clones at the original tile positions
+      const clones = selectedTiles.map((tile, i) => {
+        const rect = tileRects[i];
+        const clone = tile.cloneNode(true);
+        clone.classList.remove('selected');
+        clone.classList.add('conn-tile-flying');
+        Object.assign(clone.style, {
+          position: 'fixed',
+          left: rect.left + 'px',
+          top: rect.top + 'px',
+          width: rect.width + 'px',
+          height: rect.height + 'px',
+          zIndex: '1000',
+          margin: '0',
+          boxSizing: 'border-box',
+        });
+        document.body.appendChild(clone);
+        return clone;
+      });
+
+      // Hide original selected tiles
+      selectedTiles.forEach(t => t.style.visibility = 'hidden');
+
+      // Animate clones flying up to the solved area
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const targetY = solvedRect.bottom;
+          const segWidth = solvedRect.width / 4;
+          clones.forEach((clone, i) => {
+            clone.style.left = (solvedRect.left + i * segWidth) + 'px';
+            clone.style.top = targetY + 'px';
+            clone.style.width = segWidth + 'px';
+            clone.style.height = '48px';
+            clone.style.opacity = '0';
+          });
+        });
+      });
+
+      // After animation, update state and render the solved group
+      setTimeout(() => {
+        clones.forEach(c => c.remove());
+
+        solved.push(matchedGroup);
+        renderSolvedGroup(matchedGroup);
+        remainingWords = remainingWords.filter(w => !selected.has(w));
+        selected.clear();
+        renderBoard();
+        renderMistakes();
+        animating = false;
+
+        if (solved.length === 4) {
+          endGame(true);
+        }
+      }, 450);
     } else {
+      // Wrong guess
       // Check if they're "one away" (3 of 4 correct in some group)
       const almostGroup = puzzle.groups.find(group => {
         if (solved.includes(group)) return false;
@@ -224,6 +282,13 @@ const Connections = (() => {
       mistakes++;
       renderBoard();
       renderMistakes();
+
+      // Shake the selected tiles
+      const selectedTiles = boardEl.querySelectorAll('.conn-tile.selected');
+      selectedTiles.forEach(t => t.classList.add('shake'));
+      setTimeout(() => {
+        selectedTiles.forEach(t => t.classList.remove('shake'));
+      }, 600);
 
       if (almostGroup) {
         mistakesEl.textContent = 'One away!';
@@ -274,5 +339,5 @@ const Connections = (() => {
     localStorage.setItem('connections-stats', JSON.stringify(stats));
   }
 
-  return { init };
+  return { init, showPicker, isInGame };
 })();
