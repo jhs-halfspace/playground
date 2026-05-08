@@ -636,6 +636,9 @@ const Balatro = (() => {
     // Joker area
     renderJokerRow(dom.jokerArea, state.jokers, false);
 
+    // Deck pile
+    renderDeckPile();
+
     // Cards in hand
     renderHandCards();
 
@@ -653,6 +656,23 @@ const Balatro = (() => {
     dom.sortBtn.disabled = state.phase !== 'playing';
     dom.playBtn.textContent = 'Play Hand (' + state.hands + ')';
     dom.discardBtn.textContent = 'Discard (' + state.discards + ')';
+  }
+
+  function renderDeckPile() {
+    const n = state.drawPile.length;
+    if (n > 0) {
+      dom.deckPile.innerHTML =
+        '<div class="deck-stack">' +
+          '<div class="deck-card-back"></div>' +
+        '</div>' +
+        '<span class="deck-count">' + n + '</span>';
+      dom.deckPile.style.display = '';
+    } else {
+      dom.deckPile.innerHTML =
+        '<div class="deck-stack empty"></div>' +
+        '<span class="deck-count">0</span>';
+      dom.deckPile.style.display = '';
+    }
   }
 
   function renderHandCards() {
@@ -693,9 +713,9 @@ const Balatro = (() => {
       dom.handType.innerHTML =
         '<span class="ht-name">' + handType + '</span> ' +
         '<span class="ht-level">lvl ' + level + '</span> ' +
-        '<span class="ht-chips">' + chips + '</span> ' +
-        '<span class="ht-x">\u00d7</span> ' +
-        '<span class="ht-mult">' + mult + '</span>';
+        '<span class="ht-chip-badge">' + chips + '</span>' +
+        '<span class="ht-x">\u00d7</span>' +
+        '<span class="ht-mult-badge">' + mult + '</span>';
     } else {
       dom.handType.textContent = '';
     }
@@ -712,7 +732,7 @@ const Balatro = (() => {
       const def = JOKER_DEFS.find(d => d.id === joker.id);
       if (!def) return;
       const el = document.createElement('div');
-      el.className = 'bal-joker-card' + (sellable ? ' sellable' : '');
+      el.className = 'bal-joker-card ' + (def.rarity || 'common') + (sellable ? ' sellable' : '');
       el.innerHTML =
         '<span class="joker-name">' + def.name + '</span>' +
         '<span class="joker-desc">' + def.desc + '</span>' +
@@ -780,10 +800,10 @@ const Balatro = (() => {
         '<div class="score-hand-name">' + result.handType +
           ' <small>lvl ' + result.level + '</small></div>' +
         '<div class="score-calc">' +
-          '<span class="score-chips">' + result.chips + '</span>' +
-          ' <span class="score-x">\u00d7</span> ' +
-          '<span class="score-mult">' + result.mult + '</span>' +
-          ' <span class="score-eq">=</span> ' +
+          '<span class="score-chip-badge">' + result.chips + '</span>' +
+          '<span class="score-x">\u00d7</span>' +
+          '<span class="score-mult-badge">' + result.mult + '</span>' +
+          '<span class="score-eq">=</span>' +
           '<span class="score-total">' + result.total.toLocaleString() + '</span>' +
         '</div>' +
       '</div>';
@@ -829,6 +849,7 @@ const Balatro = (() => {
     dom.roundStats = document.getElementById('bal-round-stats');
     dom.jokerArea = document.getElementById('bal-joker-area');
     dom.message = document.getElementById('bal-message');
+    dom.deckPile = document.getElementById('bal-deck-pile');
     dom.handArea = document.getElementById('bal-hand-area');
     dom.handType = document.getElementById('bal-hand-type');
     dom.playBtn = document.getElementById('bal-play-btn');

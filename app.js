@@ -40,6 +40,9 @@ function showScreen(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
 
+  // Theme the page for immersive game screens
+  document.body.dataset.screen = name;
+
   if (name === 'home') {
     headerTitle.textContent = 'Games';
     backBtn.classList.add('hidden');
