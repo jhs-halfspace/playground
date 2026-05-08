@@ -227,7 +227,11 @@ const Connections = (() => {
 
       if (almostGroup) {
         mistakesEl.textContent = 'One away!';
-        setTimeout(renderMistakes, 1500);
+        mistakesEl.classList.add('one-away');
+        setTimeout(() => {
+          mistakesEl.classList.remove('one-away');
+          renderMistakes();
+        }, 3000);
       }
 
       if (mistakes >= maxMistakes) {

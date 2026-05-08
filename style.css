@@ -303,6 +303,23 @@ header h1 {
   margin-bottom: 12px;
   text-align: center;
   min-height: 24px;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  border-radius: 8px;
+  padding: 4px 12px;
+}
+
+#connections-mistakes.one-away {
+  background-color: #f59e0b;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transform: scale(1.08);
+  animation: one-away-pulse 0.6s ease-in-out 2;
+}
+
+@keyframes one-away-pulse {
+  0%, 100% { transform: scale(1.08); }
+  50% { transform: scale(1.15); }
 }
 
 #connections-controls {

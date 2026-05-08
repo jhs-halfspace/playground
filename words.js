@@ -475,5 +475,185 @@ const CONNECTIONS_PUZZLES = [
       { name: 'Paint types', words: ['ACRYLIC', 'ENAMEL', 'LATEX', 'MATTE'], difficulty: 2 },
       { name: '___cake', words: ['CUP', 'HOT', 'PAN', 'SHORT'], difficulty: 3 }
     ]
+  },
+  {
+    id: 31,
+    groups: [
+      { name: 'Loud', words: ['BOOM', 'CRASH', 'ROAR', 'THUNDER'], difficulty: 0 },
+      { name: 'Hairstyles', words: ['BOB', 'BRAID', 'BUN', 'MULLET'], difficulty: 1 },
+      { name: 'Card games', words: ['CANASTA', 'CRIBBAGE', 'RUMMY', 'SOLITAIRE'], difficulty: 2 },
+      { name: '___ ball', words: ['BASE', 'BASKET', 'FOOT', 'SNOW'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 32,
+    groups: [
+      { name: 'Twist', words: ['COIL', 'CURL', 'SPIRAL', 'WIND'], difficulty: 0 },
+      { name: 'Woodworking tools', words: ['CHISEL', 'CLAMP', 'LATHE', 'PLANE'], difficulty: 1 },
+      { name: 'Greek letters', words: ['ALPHA', 'DELTA', 'OMEGA', 'SIGMA'], difficulty: 2 },
+      { name: 'Honey ___', words: ['BEE', 'COMB', 'DEW', 'MOON'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 33,
+    groups: [
+      { name: 'Vanish', words: ['FADE', 'MELT', 'SINK', 'VANISH'], difficulty: 0 },
+      { name: 'Breakfast drinks', words: ['COFFEE', 'JUICE', 'MILK', 'TEA'], difficulty: 1 },
+      { name: 'Famous bridges', words: ['BROOKLYN', 'GOLDEN', 'LONDON', 'TOWER'], difficulty: 2 },
+      { name: '___ drop', words: ['AIR', 'BACK', 'GUM', 'TEAR'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 34,
+    groups: [
+      { name: 'Bright', words: ['BRILLIANT', 'DAZZLING', 'RADIANT', 'VIVID'], difficulty: 0 },
+      { name: 'Things with stripes', words: ['FLAG', 'TIGER', 'ZEBRA', 'REFEREE'], difficulty: 1 },
+      { name: 'Types of cheese', words: ['BRIE', 'CHEDDAR', 'GOUDA', 'SWISS'], difficulty: 2 },
+      { name: '___side', words: ['BED', 'BLIND', 'DOWN', 'HILL'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 35,
+    groups: [
+      { name: 'Courage', words: ['GRIT', 'GUTS', 'NERVE', 'SPINE'], difficulty: 0 },
+      { name: 'Kitchen appliances', words: ['BLENDER', 'MIXER', 'OVEN', 'TOASTER'], difficulty: 1 },
+      { name: 'Shakespeare plays', words: ['HAMLET', 'MACBETH', 'OTHELLO', 'TEMPEST'], difficulty: 2 },
+      { name: 'Basket ___', words: ['BALL', 'CASE', 'WEAVE', 'WORK'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 36,
+    groups: [
+      { name: 'Grab', words: ['CLUTCH', 'GRASP', 'SEIZE', 'SNATCH'], difficulty: 0 },
+      { name: 'Things that tick', words: ['BOMB', 'CLOCK', 'HEART', 'METRONOME'], difficulty: 1 },
+      { name: 'World capitals', words: ['BERLIN', 'CAIRO', 'DUBLIN', 'TOKYO'], difficulty: 2 },
+      { name: 'Super ___', words: ['HERO', 'MAN', 'NATURAL', 'STAR'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 37,
+    groups: [
+      { name: 'Dull', words: ['BLAND', 'DREARY', 'FLAT', 'STALE'], difficulty: 0 },
+      { name: 'Things with teeth', words: ['COMB', 'GEAR', 'SAW', 'ZIPPER'], difficulty: 1 },
+      { name: 'Dances', words: ['FOXTROT', 'MAMBO', 'POLKA', 'RUMBA'], difficulty: 2 },
+      { name: 'Peanut ___', words: ['BRITTLE', 'BUTTER', 'GALLERY', 'SHELL'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 38,
+    groups: [
+      { name: 'Leak', words: ['DRIP', 'OOZE', 'SEEP', 'TRICKLE'], difficulty: 0 },
+      { name: 'Orchestra sections', words: ['BRASS', 'PERCUSSION', 'STRING', 'WOODWIND'], difficulty: 1 },
+      { name: 'Dog commands', words: ['FETCH', 'HEEL', 'SIT', 'STAY'], difficulty: 2 },
+      { name: '___ point', words: ['BREAK', 'CHECK', 'GUN', 'STAND'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 39,
+    groups: [
+      { name: 'Decline', words: ['DIP', 'DROP', 'PLUNGE', 'SLIDE'], difficulty: 0 },
+      { name: 'Things with wings', words: ['ANGEL', 'BAT', 'PLANE', 'STAGE'], difficulty: 1 },
+      { name: 'Nobel Prize categories', words: ['CHEMISTRY', 'LITERATURE', 'PEACE', 'PHYSICS'], difficulty: 2 },
+      { name: 'Hot ___', words: ['DOG', 'HEAD', 'LINE', 'SHOT'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 40,
+    groups: [
+      { name: 'Peak', words: ['APEX', 'CREST', 'SUMMIT', 'ZENITH'], difficulty: 0 },
+      { name: 'Camping gear', words: ['FLASK', 'LANTERN', 'SLEEPING', 'TENT'], difficulty: 1 },
+      { name: 'Famous paintings', words: ['GUERNICA', 'MONA', 'SCREAM', 'STARRY'], difficulty: 2 },
+      { name: '___man', words: ['ANCHOR', 'FIRE', 'SAND', 'SNOW'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 41,
+    groups: [
+      { name: 'Rush', words: ['BOLT', 'DART', 'DASH', 'SPRINT'], difficulty: 0 },
+      { name: 'Knitting terms', words: ['CAST', 'PEARL', 'PURL', 'STITCH'], difficulty: 1 },
+      { name: 'Types of triangle', words: ['ACUTE', 'EQUILATERAL', 'OBTUSE', 'SCALENE'], difficulty: 2 },
+      { name: 'Paper ___', words: ['BACK', 'CLIP', 'TOWEL', 'WEIGHT'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 42,
+    groups: [
+      { name: 'Disgusting', words: ['FOUL', 'GROSS', 'NASTY', 'VILE'], difficulty: 0 },
+      { name: 'Parts of a castle', words: ['DRAWBRIDGE', 'MOAT', 'TOWER', 'TURRET'], difficulty: 1 },
+      { name: 'Fictional islands', words: ['NEVERLAND', 'SKULL', 'TREASURE', 'UTOPIA'], difficulty: 2 },
+      { name: '___ chip', words: ['BLUE', 'MICRO', 'POKER', 'WOOD'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 43,
+    groups: [
+      { name: 'Copy', words: ['CLONE', 'MIMIC', 'MIRROR', 'PARROT'], difficulty: 0 },
+      { name: 'Salad ingredients', words: ['CROUTON', 'LETTUCE', 'OLIVE', 'TOMATO'], difficulty: 1 },
+      { name: 'Horror directors', words: ['CARPENTER', 'CRAVEN', 'HITCHCOCK', 'ROMERO'], difficulty: 2 },
+      { name: 'Red ___', words: ['CARPET', 'FLAG', 'HERRING', 'TAPE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 44,
+    groups: [
+      { name: 'Pile', words: ['HEAP', 'MOUND', 'STACK', 'STASH'], difficulty: 0 },
+      { name: 'Things that bloom', words: ['DAISY', 'ORCHID', 'ROSE', 'TULIP'], difficulty: 1 },
+      { name: 'Classic arcade games', words: ['ASTEROIDS', 'FROGGER', 'GALAGA', 'TETRIS'], difficulty: 2 },
+      { name: 'Gold ___', words: ['DIGGER', 'FISH', 'MINE', 'RUSH'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 45,
+    groups: [
+      { name: 'Harsh', words: ['BLUNT', 'BRUTAL', 'RAW', 'SEVERE'], difficulty: 0 },
+      { name: 'Things with scales', words: ['DRAGON', 'FISH', 'JUSTICE', 'PIANO'], difficulty: 1 },
+      { name: 'Types of wave', words: ['HEAT', 'RADIO', 'SHOCK', 'SOUND'], difficulty: 2 },
+      { name: '___hand', words: ['BACK', 'CLOCK', 'FIRST', 'SHORT'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 46,
+    groups: [
+      { name: 'Flaw', words: ['BLEMISH', 'CRACK', 'DEFECT', 'GLITCH'], difficulty: 0 },
+      { name: 'Things in an office', words: ['DESK', 'LAMP', 'STAPLER', 'SWIVEL'], difficulty: 1 },
+      { name: 'Country music legends', words: ['CASH', 'CLINE', 'NELSON', 'PARTON'], difficulty: 2 },
+      { name: 'Black ___', words: ['BELT', 'BIRD', 'HOLE', 'MARKET'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 47,
+    groups: [
+      { name: 'Soak', words: ['BATHE', 'DRENCH', 'RINSE', 'STEEP'], difficulty: 0 },
+      { name: 'Wind instruments', words: ['CLARINET', 'FLUTE', 'OBOE', 'TRUMPET'], difficulty: 1 },
+      { name: 'Constellations', words: ['ORION', 'PEGASUS', 'PHOENIX', 'SCORPIO'], difficulty: 2 },
+      { name: 'Half ___', words: ['BACK', 'PIPE', 'TIME', 'WAY'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 48,
+    groups: [
+      { name: 'Stall', words: ['DELAY', 'DRAG', 'HEDGE', 'STALL'], difficulty: 0 },
+      { name: 'Martial arts', words: ['AIKIDO', 'JUDO', 'KARATE', 'KUNG'], difficulty: 1 },
+      { name: 'Famous robots', words: ['BAYMAX', 'OPTIMUS', 'TERMINATOR', 'WALL'], difficulty: 2 },
+      { name: 'Blind ___', words: ['DATE', 'FOLD', 'SIDE', 'SPOT'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 49,
+    groups: [
+      { name: 'Genuine', words: ['AUTHENTIC', 'HONEST', 'REAL', 'TRUE'], difficulty: 0 },
+      { name: 'Sailing terms', words: ['ANCHOR', 'HELM', 'PORT', 'STERN'], difficulty: 1 },
+      { name: 'Pixar films', words: ['BRAVE', 'CARS', 'COCO', 'SOUL'], difficulty: 2 },
+      { name: 'Tooth ___', words: ['ACHE', 'BRUSH', 'FAIRY', 'PASTE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 50,
+    groups: [
+      { name: 'Scatter', words: ['DISPERSE', 'SCATTER', 'SPREAD', 'STREW'], difficulty: 0 },
+      { name: 'Things at a circus', words: ['CANNON', 'CLOWN', 'TRAPEZE', 'TIGHTROPE'], difficulty: 1 },
+      { name: 'Famous walls', words: ['BERLIN', 'CHINA', 'STREET', 'WESTERN'], difficulty: 2 },
+      { name: 'Eye ___', words: ['BROW', 'LID', 'LINER', 'WITNESS'], difficulty: 3 }
+    ]
   }
 ];
