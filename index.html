@@ -100,6 +100,18 @@
       <p class="bal-desc">Build poker hands, collect jokers, beat the blinds</p>
       <button id="bal-new-run" class="new-game-btn">New Run</button>
     </div>
+    <!-- Deck Selection -->
+    <div id="bal-deck-select" class="hidden">
+      <h2 class="bal-title" style="font-size:1.4rem">Choose Your Deck</h2>
+      <div id="bal-deck-grid"></div>
+      <div id="bal-stake-select"></div>
+      <button id="bal-start-run" class="new-game-btn">Start Run</button>
+    </div>
+    <!-- Blind Selection -->
+    <div id="bal-blind-select" class="hidden">
+      <h2 class="bal-section-title">Choose a Blind</h2>
+      <div id="bal-blind-options"></div>
+    </div>
     <!-- Game View -->
     <div id="bal-game" class="hidden">
       <div id="bal-top-bar"></div>
@@ -110,6 +122,7 @@
       </div>
       <div id="bal-round-stats"></div>
       <div id="bal-joker-area"></div>
+      <div id="bal-consumable-area"></div>
       <div id="bal-message"></div>
       <div id="bal-table-area">
         <div id="bal-deck-pile"></div>
@@ -124,15 +137,26 @@
     </div>
     <!-- Shop View -->
     <div id="bal-shop" class="hidden">
-      <h2 class="bal-shop-title">Round Complete!</h2>
+      <h2 class="bal-shop-title">Shop</h2>
       <div id="bal-shop-info"></div>
-      <div id="bal-shop-items"></div>
+      <div id="bal-shop-cards"></div>
+      <div id="bal-shop-packs"></div>
+      <div id="bal-shop-voucher"></div>
       <div id="bal-shop-controls">
         <button id="bal-reroll-btn" class="ctrl-btn">Reroll $5</button>
         <button id="bal-next-btn" class="ctrl-btn primary">Next Round</button>
       </div>
       <p class="bal-shop-label">Your Jokers (click to sell)</p>
       <div id="bal-owned-jokers"></div>
+      <p class="bal-shop-label">Consumables</p>
+      <div id="bal-owned-consumables"></div>
+    </div>
+    <!-- Pack Opening -->
+    <div id="bal-pack-open" class="hidden">
+      <h2 id="bal-pack-title" class="bal-shop-title"></h2>
+      <div id="bal-pack-contents"></div>
+      <p id="bal-pack-instructions" class="bal-shop-label"></p>
+      <button id="bal-pack-skip" class="ctrl-btn">Skip</button>
     </div>
     <!-- Game Over -->
     <div id="bal-gameover" class="hidden">
@@ -146,6 +170,11 @@
   <script src="./words.js"></script>
   <script src="./wordle.js"></script>
   <script src="./connections.js"></script>
+  <script src="./balatro-data.js"></script>
+  <script src="./balatro-jokers.js"></script>
+  <script src="./balatro-consumables.js"></script>
+  <script src="./balatro-collection.js"></script>
+  <script src="./balatro-engine.js"></script>
   <script src="./balatro.js"></script>
   <script src="./app.js"></script>
 </body>

@@ -1231,6 +1231,373 @@ body[data-screen="balatro"] .header-btn {
   color: #6b7d64;
 }
 
+/* ---- Deck selection ---- */
+
+#bal-deck-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  flex: 1;
+}
+
+#bal-deck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.bal-deck-option {
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(200, 170, 110, 0.2);
+  border-radius: 8px;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bal-deck-option.selected {
+  border-color: #daa520;
+  background: rgba(218, 165, 32, 0.15);
+}
+
+.bal-deck-option:hover { border-color: rgba(218, 165, 32, 0.5); }
+
+.deck-name {
+  display: block;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.deck-desc {
+  display: block;
+  font-size: 0.6rem;
+  color: #a8b5a0;
+  margin-top: 2px;
+}
+
+#bal-stake-select { width: 100%; text-align: center; }
+
+.bal-stake-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.bal-stake-chip {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 2px solid;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #e8e6d9;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bal-stake-chip.selected { color: #1a1a1b; }
+
+/* ---- Blind selection ---- */
+
+#bal-blind-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  flex: 1;
+}
+
+.bal-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8e6d9;
+}
+
+#bal-blind-options {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.bal-blind-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(200, 170, 110, 0.15);
+  border-radius: 10px;
+  padding: 14px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.4;
+}
+
+.bal-blind-card.current {
+  opacity: 1;
+  border-color: #daa520;
+  background: rgba(218, 165, 32, 0.08);
+}
+
+.bal-blind-card.past { opacity: 0.25; }
+
+.blind-header {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #e8e6d9;
+}
+
+.blind-ante {
+  font-size: 0.7rem;
+  color: #7dcea0;
+}
+
+.blind-target {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.blind-boss-desc {
+  font-size: 0.65rem;
+  color: #ff8a8a;
+}
+
+.blind-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.blind-actions .ctrl-btn {
+  font-size: 0.75rem;
+  padding: 6px 14px;
+}
+
+.bal-skip-btn { color: #a8b5a0 !important; }
+
+.bal-tags-display {
+  font-size: 0.8rem;
+  color: #a8b5a0;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.bal-tag {
+  display: inline-block;
+  background: rgba(218, 165, 32, 0.2);
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  color: #ffd700;
+  margin: 2px;
+}
+
+/* ---- Consumable area (in-game) ---- */
+
+#bal-consumable-area {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  min-height: 32px;
+  align-items: center;
+}
+
+.bal-consumable-card {
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 60px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.bal-consumable-card.tarot { background: linear-gradient(135deg, #5b2c6f 0%, #3b1a4a 100%); }
+.bal-consumable-card.planet { background: linear-gradient(135deg, #1a5276 0%, #0e3247 100%); }
+.bal-consumable-card.spectral { background: linear-gradient(135deg, #1a3c34 0%, #0d2620 100%); border-color: rgba(100, 255, 200, 0.2); }
+.bal-consumable-card.empty { background: rgba(255, 255, 255, 0.05); border-style: dashed; color: #6b7d64; cursor: default; }
+.bal-consumable-card.sellable:hover { transform: scale(1.05); }
+
+.cons-name { font-weight: 700; font-size: 0.65rem; }
+.cons-type { font-size: 0.55rem; opacity: 0.7; text-transform: capitalize; }
+
+/* ---- Shop sections ---- */
+
+#bal-shop-cards,
+#bal-shop-packs {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.bal-shop-pack {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(200, 170, 110, 0.25);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bal-shop-pack:hover:not(.disabled) {
+  border-color: #daa520;
+}
+
+.bal-shop-pack.disabled { opacity: 0.4; cursor: default; }
+
+.pack-name { font-weight: 700; font-size: 0.85rem; color: #e8e6d9; }
+.pack-info { font-size: 0.7rem; color: #a8b5a0; }
+
+.shop-item-type {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7dcea0;
+  font-weight: 600;
+}
+
+/* ---- Voucher card ---- */
+
+.bal-shop-voucher-card {
+  background: rgba(218, 165, 32, 0.1);
+  border: 2px solid rgba(218, 165, 32, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bal-shop-voucher-card:hover:not(.disabled) { border-color: #ffd700; }
+.bal-shop-voucher-card.disabled { opacity: 0.4; cursor: default; }
+
+.voucher-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #daa520;
+  font-weight: 700;
+}
+
+#bal-owned-consumables {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Pack opening ---- */
+
+#bal-pack-open {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  flex: 1;
+}
+
+#bal-pack-contents {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bal-pack-item {
+  flex: 1;
+  min-width: 80px;
+  max-width: 140px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(200, 170, 110, 0.25);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bal-pack-item:hover {
+  border-color: #daa520;
+  transform: translateY(-4px);
+}
+
+/* ---- Card modifier indicators ---- */
+
+.bal-card.debuffed { opacity: 0.4; filter: grayscale(0.8); }
+
+.bal-card.enh-bonus { box-shadow: 0 0 6px rgba(37, 99, 235, 0.5) inset; }
+.bal-card.enh-mult { box-shadow: 0 0 6px rgba(220, 53, 69, 0.5) inset; }
+.bal-card.enh-wild { background: linear-gradient(135deg, #faf8f0 60%, #e0c0ff 100%); }
+.bal-card.enh-glass { background: rgba(200, 220, 255, 0.7); border-color: rgba(100, 150, 255, 0.4); }
+.bal-card.enh-steel { background: linear-gradient(135deg, #d0d8e8 0%, #a0b0c8 100%); }
+.bal-card.enh-stone { background: #8b8b8b; color: #555 !important; }
+.bal-card.enh-gold { background: linear-gradient(135deg, #ffeaa0 0%, #daa520 100%); }
+.bal-card.enh-lucky { background: linear-gradient(135deg, #faf8f0 80%, #90ee90 100%); }
+
+.bal-card.ed-foil { box-shadow: 0 0 8px rgba(200, 200, 255, 0.6); }
+.bal-card.ed-holographic { box-shadow: 0 0 8px rgba(255, 100, 255, 0.4); }
+.bal-card.ed-polychrome { box-shadow: 0 0 10px rgba(255, 150, 50, 0.4); }
+
+.card-seal {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.seal-dot-gold { background: #ffd700; }
+.seal-dot-red { background: #dc3545; }
+.seal-dot-blue { background: #2563eb; }
+.seal-dot-purple { background: #7b2d8e; }
+
+/* ---- Joker editions ---- */
+
+.bal-joker-card.ed-foil { box-shadow: 0 0 8px rgba(200, 200, 255, 0.4); }
+.bal-joker-card.ed-holographic { box-shadow: 0 0 8px rgba(255, 100, 255, 0.3); }
+.bal-joker-card.ed-polychrome { box-shadow: 0 0 10px rgba(255, 150, 50, 0.3); }
+.bal-joker-card.debuffed { opacity: 0.35; filter: grayscale(0.6); }
+
+.joker-edition {
+  font-size: 0.55rem;
+  color: #daa520;
+  font-style: italic;
+}
+
 /* ---- Game over ---- */
 
 #bal-result {
