@@ -42,6 +42,10 @@
       <h2>Connections</h2>
       <p>Find 4 groups of 4 related words</p>
     </div>
+    <div class="game-card" data-game="balatro">
+      <h2>Balatro</h2>
+      <p>Poker roguelike &mdash; build hands, collect jokers, beat the blinds</p>
+    </div>
   </main>
 
   <!-- WORDLE SCREEN -->
@@ -53,6 +57,13 @@
     </div>
     <!-- Game View (hidden until a puzzle is picked) -->
     <div id="wordle-game" class="hidden">
+      <div id="wordle-hard-mode-toggle">
+        <label class="toggle-label">
+          <input type="checkbox" id="wordle-hard-mode">
+          <span class="toggle-switch"></span>
+          Hard Mode
+        </label>
+      </div>
       <div id="wordle-board"></div>
       <div id="wordle-message"></div>
       <div id="wordle-keyboard"></div>
@@ -81,10 +92,58 @@
     </div>
   </main>
 
+  <!-- BALATRO SCREEN -->
+  <main id="balatro-screen" class="screen">
+    <!-- Menu -->
+    <div id="bal-menu">
+      <h2 class="bal-title">Balatro</h2>
+      <p class="bal-desc">Build poker hands, collect jokers, beat the blinds</p>
+      <button id="bal-new-run" class="new-game-btn">New Run</button>
+    </div>
+    <!-- Game View -->
+    <div id="bal-game" class="hidden">
+      <div id="bal-top-bar"></div>
+      <div id="bal-boss-info" class="hidden"></div>
+      <div id="bal-score-bar">
+        <div id="bal-score-fill"></div>
+        <span id="bal-score-text"></span>
+      </div>
+      <div id="bal-round-stats"></div>
+      <div id="bal-joker-area"></div>
+      <div id="bal-message"></div>
+      <div id="bal-hand-area"></div>
+      <div id="bal-hand-type"></div>
+      <div id="bal-controls">
+        <button id="bal-play-btn" class="ctrl-btn primary" disabled>Play Hand</button>
+        <button id="bal-discard-btn" class="ctrl-btn" disabled>Discard</button>
+        <button id="bal-sort-btn" class="ctrl-btn">Sort</button>
+      </div>
+    </div>
+    <!-- Shop View -->
+    <div id="bal-shop" class="hidden">
+      <h2 class="bal-shop-title">Round Complete!</h2>
+      <div id="bal-shop-info"></div>
+      <div id="bal-shop-items"></div>
+      <div id="bal-shop-controls">
+        <button id="bal-reroll-btn" class="ctrl-btn">Reroll $5</button>
+        <button id="bal-next-btn" class="ctrl-btn primary">Next Round</button>
+      </div>
+      <p class="bal-shop-label">Your Jokers (click to sell)</p>
+      <div id="bal-owned-jokers"></div>
+    </div>
+    <!-- Game Over -->
+    <div id="bal-gameover" class="hidden">
+      <h2 id="bal-result"></h2>
+      <p id="bal-result-detail"></p>
+      <button id="bal-restart" class="new-game-btn">New Run</button>
+    </div>
+  </main>
+
   <!-- Load scripts in order: data first, then game logic, then the app shell -->
   <script src="./words.js"></script>
   <script src="./wordle.js"></script>
   <script src="./connections.js"></script>
+  <script src="./balatro.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

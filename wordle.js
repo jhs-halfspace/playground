@@ -23,9 +23,16 @@ const Wordle = (() => {
   let currentGuess = '';   // What the player is currently typing
   let gameOver = false;
   let maxGuesses = 6;
+  let hardMode = false;
+
+  // Hard mode constraints built from previous guesses:
+  // - correctPositions[i] = letter that MUST be at position i (green)
+  // - requiredLetters = Set of letters that MUST appear somewhere (yellow/green)
+  let correctPositions = [null, null, null, null, null];
+  let requiredLetters = new Set();
 
   // DOM references (set in init)
-  let boardEl, messageEl, keyboardEl, newGameBtn;
+  let boardEl, messageEl, keyboardEl, newGameBtn, hardModeCheckbox;
   let pickerEl, gameEl, puzzleGridEl;
 
   // Keyboard layout - matches the standard QWERTY layout
@@ -72,6 +79,23 @@ const Wordle = (() => {
     pickerEl = document.getElementById('wordle-picker');
     gameEl = document.getElementById('wordle-game');
     puzzleGridEl = document.getElementById('wordle-puzzle-grid');
+
+    hardModeCheckbox = document.getElementById('wordle-hard-mode');
+
+    // Restore hard mode preference from localStorage
+    hardMode = localStorage.getItem('wordle-hard-mode') === 'true';
+    hardModeCheckbox.checked = hardMode;
+
+    hardModeCheckbox.addEventListener('change', () => {
+      // Can only toggle hard mode before the first guess of a puzzle
+      if (guesses.length > 0 && !gameOver) {
+        hardModeCheckbox.checked = hardMode; // revert
+        showMessage('Can only change mode before first guess');
+        return;
+      }
+      hardMode = hardModeCheckbox.checked;
+      localStorage.setItem('wordle-hard-mode', hardMode);
+    });
 
     buildKeyboard();
     newGameBtn.addEventListener('click', showPicker);
@@ -123,8 +147,13 @@ const Wordle = (() => {
     currentGuess = '';
     gameOver = false;
     letterStates = {};
+    correctPositions = [null, null, null, null, null];
+    requiredLetters = new Set();
     messageEl.textContent = '';
     newGameBtn.classList.add('hidden');
+
+    // Restore toggle state (re-enable changing since no guesses yet)
+    hardModeCheckbox.checked = hardMode;
 
     buildBoard();
     updateKeyboard();
@@ -285,12 +314,40 @@ const Wordle = (() => {
       return;
     }
 
+    // Hard mode validation: check constraints from previous guesses
+    if (hardMode && guesses.length > 0) {
+      // Check green constraints: correct letters must stay in position
+      for (let i = 0; i < 5; i++) {
+        if (correctPositions[i] && currentGuess[i] !== correctPositions[i]) {
+          showMessage(`${ordinal(i + 1)} letter must be ${correctPositions[i]}`);
+          return;
+        }
+      }
+      // Check yellow constraints: required letters must appear somewhere
+      for (const letter of requiredLetters) {
+        if (!currentGuess.includes(letter)) {
+          showMessage(`Guess must contain ${letter}`);
+          return;
+        }
+      }
+    }
+
     const guess = currentGuess;
     const result = evaluateGuess(guess);
     const row = guesses.length;
 
     guesses.push(guess);
     currentGuess = '';
+
+    // Update hard mode constraints from this guess
+    for (let i = 0; i < 5; i++) {
+      if (result[i] === 'correct') {
+        correctPositions[i] = guess[i];
+        requiredLetters.add(guess[i]);
+      } else if (result[i] === 'present') {
+        requiredLetters.add(guess[i]);
+      }
+    }
 
     // Animate tile reveals with staggered delays.
     // Each tile flips after a short delay so they reveal left-to-right.
@@ -358,6 +415,10 @@ const Wordle = (() => {
       stats.distribution[guesses.length - 1]++;
     }
     localStorage.setItem('wordle-stats', JSON.stringify(stats));
+  }
+
+  function ordinal(n) {
+    return ['1st','2nd','3rd','4th','5th'][n - 1] || n + 'th';
   }
 
   function isInGame() {
