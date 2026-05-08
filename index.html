@@ -46,10 +46,18 @@
 
   <!-- WORDLE SCREEN -->
   <main id="wordle-screen" class="screen">
-    <div id="wordle-board"></div>
-    <div id="wordle-message"></div>
-    <div id="wordle-keyboard"></div>
-    <button id="wordle-new-game" class="new-game-btn hidden">New Game</button>
+    <!-- Puzzle Picker -->
+    <div id="wordle-picker">
+      <p class="picker-label">Choose a puzzle</p>
+      <div id="wordle-puzzle-grid"></div>
+    </div>
+    <!-- Game View (hidden until a puzzle is picked) -->
+    <div id="wordle-game" class="hidden">
+      <div id="wordle-board"></div>
+      <div id="wordle-message"></div>
+      <div id="wordle-keyboard"></div>
+      <button id="wordle-new-game" class="new-game-btn hidden">Back to Puzzles</button>
+    </div>
   </main>
 
   <!-- CONNECTIONS SCREEN -->

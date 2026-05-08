@@ -64,7 +64,11 @@ document.querySelectorAll('.game-card').forEach(card => {
 });
 
 backBtn.addEventListener('click', () => {
-  // If inside a connections puzzle, go back to the puzzle picker first
+  // If inside a game puzzle, go back to the puzzle picker first
+  if (screens.wordle.classList.contains('active') && Wordle.isInGame()) {
+    Wordle.showPicker();
+    return;
+  }
   if (screens.connections.classList.contains('active') && Connections.isInGame()) {
     Connections.showPicker();
     return;

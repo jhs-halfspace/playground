@@ -25,16 +25,53 @@ const Connections = (() => {
   let boardEl, solvedEl, mistakesEl, submitBtn, deselectBtn, shuffleBtn, newGameBtn;
   let pickerEl, gameEl, puzzleGridEl;
 
-  // Track which puzzle IDs have been completed (won)
-  function getCompletedIds() {
-    return JSON.parse(localStorage.getItem('connections-completed') || '[]');
+  // --------------------------------------------------------
+  // PROGRESS PERSISTENCE
+  // --------------------------------------------------------
+
+  function getProgress() {
+    return JSON.parse(localStorage.getItem('connections-progress') || '{}');
   }
 
-  function saveCompleted(id) {
-    const completed = getCompletedIds();
-    if (!completed.includes(id)) {
-      completed.push(id);
-      localStorage.setItem('connections-completed', JSON.stringify(completed));
+  function saveProgress() {
+    if (!puzzle) return;
+    // Only save if there's been actual game activity
+    if (solved.length === 0 && mistakes === 0 && !gameOver) return;
+
+    const progress = getProgress();
+    let status = 'in-progress';
+    if (gameOver) status = solved.length === puzzle.groups.length ? 'won' : 'lost';
+
+    progress[puzzle.id] = {
+      status,
+      solvedGroupNames: solved.map(g => g.name),
+      mistakes,
+      remainingWords: [...remainingWords]
+    };
+    localStorage.setItem('connections-progress', JSON.stringify(progress));
+  }
+
+  // Migrate old localStorage keys into the new progress system
+  function migrateProgress() {
+    const progress = getProgress();
+    if (Object.keys(progress).length > 0) return;
+
+    const completed = JSON.parse(localStorage.getItem('connections-completed') || '[]');
+    const played = JSON.parse(localStorage.getItem('connections-played') || '[]');
+
+    completed.forEach(id => {
+      const p = CONNECTIONS_PUZZLES.find(px => px.id === id);
+      const names = p ? p.groups.map(g => g.name) : [];
+      progress[id] = { status: 'won', solvedGroupNames: names, mistakes: 0, remainingWords: [] };
+    });
+    played.forEach(id => {
+      if (!progress[id]) {
+        progress[id] = { status: 'lost', solvedGroupNames: [], mistakes: 4, remainingWords: [] };
+      }
+    });
+
+    if (Object.keys(progress).length > 0) {
+      localStorage.setItem('connections-progress', JSON.stringify(progress));
     }
   }
 
@@ -55,6 +92,7 @@ const Connections = (() => {
     shuffleBtn.addEventListener('click', shuffleBoard);
     newGameBtn.addEventListener('click', showPicker);
 
+    migrateProgress();
     renderPicker();
   }
 
@@ -63,20 +101,34 @@ const Connections = (() => {
   // --------------------------------------------------------
 
   function renderPicker() {
-    const completed = getCompletedIds();
+    const progress = getProgress();
     puzzleGridEl.innerHTML = '';
 
     CONNECTIONS_PUZZLES.forEach(p => {
       const btn = document.createElement('button');
       btn.classList.add('puzzle-pick-btn');
-      if (completed.includes(p.id)) btn.classList.add('completed');
+      const saved = progress[p.id];
+      if (saved) {
+        if (saved.status === 'won') btn.classList.add('completed');
+        else if (saved.status === 'lost') btn.classList.add('failed');
+        else if (saved.status === 'in-progress') btn.classList.add('in-progress');
+      }
       btn.textContent = p.id;
-      btn.addEventListener('click', () => startPuzzle(p.id));
+      btn.addEventListener('click', () => {
+        if (saved && saved.status === 'lost') {
+          showRetryModal(p.id);
+        } else {
+          startPuzzle(p.id);
+        }
+      });
       puzzleGridEl.appendChild(btn);
     });
   }
 
   function showPicker() {
+    // Save current puzzle progress before leaving
+    if (puzzle) saveProgress();
+
     // Clean up any flying tiles from interrupted animations
     document.querySelectorAll('.conn-tile-flying').forEach(c => c.remove());
     animating = false;
@@ -97,22 +149,104 @@ const Connections = (() => {
     pickerEl.classList.add('hidden');
     gameEl.classList.remove('hidden');
 
-    // Collect and shuffle all 16 words
-    remainingWords = puzzle.groups.flatMap(g => g.words);
-    shuffle(remainingWords);
+    const progress = getProgress();
+    const saved = progress[id];
 
     selected = new Set();
-    solved = [];
-    mistakes = 0;
-    gameOver = false;
     animating = false;
-
-    newGameBtn.classList.add('hidden');
-    submitBtn.disabled = true;
     solvedEl.innerHTML = '';
 
+    if (saved && saved.status === 'in-progress') {
+      // Restore in-progress game
+      solved = saved.solvedGroupNames
+        .map(name => puzzle.groups.find(g => g.name === name))
+        .filter(Boolean);
+      mistakes = saved.mistakes || 0;
+      remainingWords = [...saved.remainingWords];
+      gameOver = false;
+      solved.forEach(g => renderSolvedGroup(g));
+    } else if (saved && saved.status === 'won') {
+      // Show completed state
+      solved = puzzle.groups.slice();
+      mistakes = saved.mistakes || 0;
+      remainingWords = [];
+      gameOver = true;
+      puzzle.groups.forEach(g => renderSolvedGroup(g));
+      mistakesEl.textContent = mistakes === 0 ? 'Perfect!' : 'Well done!';
+    } else {
+      // Fresh start (no save or unknown status)
+      remainingWords = puzzle.groups.flatMap(g => g.words);
+      shuffle(remainingWords);
+      solved = [];
+      mistakes = 0;
+      gameOver = false;
+    }
+
+    newGameBtn.classList.toggle('hidden', !gameOver);
+    submitBtn.disabled = true;
+
     renderBoard();
-    renderMistakes();
+    if (!gameOver) renderMistakes();
+  }
+
+  function showSolution(id) {
+    puzzle = CONNECTIONS_PUZZLES.find(p => p.id === id);
+    if (!puzzle) return;
+
+    pickerEl.classList.add('hidden');
+    gameEl.classList.remove('hidden');
+
+    solved = [];
+    selected = new Set();
+    mistakes = maxMistakes;
+    gameOver = true;
+    animating = false;
+    remainingWords = [];
+
+    solvedEl.innerHTML = '';
+    puzzle.groups.forEach(g => renderSolvedGroup(g));
+
+    renderBoard();
+    mistakesEl.textContent = 'Solution';
+    newGameBtn.classList.remove('hidden');
+    submitBtn.disabled = true;
+  }
+
+  function retryPuzzle(id) {
+    const progress = getProgress();
+    delete progress[id];
+    localStorage.setItem('connections-progress', JSON.stringify(progress));
+    startPuzzle(id);
+  }
+
+  function showRetryModal(puzzleId) {
+    const modal = document.createElement('div');
+    modal.classList.add('retry-modal');
+    modal.innerHTML = `
+      <div class="retry-modal-content">
+        <p class="retry-modal-title">Puzzle ${puzzleId}</p>
+        <div class="retry-modal-buttons">
+          <button class="ctrl-btn" data-action="retry">Retry</button>
+          <button class="ctrl-btn" data-action="solution">See Solution</button>
+        </div>
+        <button class="retry-modal-cancel" data-action="cancel">Cancel</button>
+      </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+      const action = e.target.dataset.action;
+      if (action === 'retry') {
+        modal.remove();
+        retryPuzzle(puzzleId);
+      } else if (action === 'solution') {
+        modal.remove();
+        showSolution(puzzleId);
+      } else if (action === 'cancel' || e.target === modal) {
+        modal.remove();
+      }
+    });
+
+    document.body.appendChild(modal);
   }
 
   // Fisher-Yates shuffle - the standard unbiased shuffle algorithm.
@@ -268,6 +402,8 @@ const Connections = (() => {
 
         if (solved.length === 4) {
           endGame(true);
+        } else {
+          saveProgress();
         }
       }, 450);
     } else {
@@ -300,43 +436,34 @@ const Connections = (() => {
       }
 
       if (mistakes >= maxMistakes) {
-        endGame(false);
+        gameOver = true; // Prevent further interaction during delay
+        // Let shake animation finish, then end game
+        setTimeout(() => endGame(false), 800);
+      } else {
+        saveProgress();
       }
     }
   }
 
   function endGame(won) {
     gameOver = true;
+    saveProgress();
 
-    // Reveal any unsolved groups
-    if (!won) {
-      puzzle.groups.forEach(group => {
-        if (!solved.includes(group)) {
-          renderSolvedGroup(group);
-        }
-      });
-      remainingWords = [];
-      renderBoard();
-      mistakesEl.textContent = 'Better luck next time!';
-    } else {
-      mistakesEl.textContent = mistakes === 0 ? 'Perfect!' : 'Well done!';
-      saveCompleted(puzzle.id);
-    }
-
-    newGameBtn.classList.remove('hidden');
-
-    // Save played puzzle
-    const played = JSON.parse(localStorage.getItem('connections-played') || '[]');
-    if (!played.includes(puzzle.id)) {
-      played.push(puzzle.id);
-      localStorage.setItem('connections-played', JSON.stringify(played));
-    }
-
-    // Save stats
+    // Save aggregate stats
     const stats = JSON.parse(localStorage.getItem('connections-stats') || '{"played":0,"won":0}');
     stats.played++;
     if (won) stats.won++;
     localStorage.setItem('connections-stats', JSON.stringify(stats));
+
+    if (!won) {
+      // Go directly to puzzle overview — don't reveal solutions
+      showPicker();
+      return;
+    }
+
+    // Won — show success message
+    mistakesEl.textContent = mistakes === 0 ? 'Perfect!' : 'Well done!';
+    newGameBtn.classList.remove('hidden');
   }
 
   return { init, showPicker, isInGame };

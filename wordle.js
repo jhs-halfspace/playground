@@ -3,7 +3,7 @@
 // ============================================================
 //
 // How it works:
-// 1. A random word is picked from WORDLE_ANSWERS.
+// 1. The player picks a numbered puzzle from the picker grid.
 // 2. The player types guesses using the on-screen keyboard
 //    (or physical keyboard on desktop).
 // 3. After each guess, tiles flip and reveal colors:
@@ -18,13 +18,15 @@
 const Wordle = (() => {
   // Game state
   let answer = '';
-  let guesses = [];       // Array of submitted guess strings
+  let puzzleIndex = -1;   // Which puzzle number is active
+  let guesses = [];        // Array of submitted guess strings
   let currentGuess = '';   // What the player is currently typing
   let gameOver = false;
   let maxGuesses = 6;
 
   // DOM references (set in init)
   let boardEl, messageEl, keyboardEl, newGameBtn;
+  let pickerEl, gameEl, puzzleGridEl;
 
   // Keyboard layout - matches the standard QWERTY layout
   const KEYBOARD_ROWS = [
@@ -37,24 +39,86 @@ const Wordle = (() => {
   // Priority: correct > present > absent
   let letterStates = {};
 
+  // Track which puzzle indices have been completed (won)
+  function getCompletedIds() {
+    return JSON.parse(localStorage.getItem('wordle-completed') || '[]');
+  }
+
+  function saveCompleted(id) {
+    const completed = getCompletedIds();
+    if (!completed.includes(id)) {
+      completed.push(id);
+      localStorage.setItem('wordle-completed', JSON.stringify(completed));
+    }
+  }
+
+  function getPlayedIds() {
+    return JSON.parse(localStorage.getItem('wordle-played') || '[]');
+  }
+
+  function savePlayed(id) {
+    const played = getPlayedIds();
+    if (!played.includes(id)) {
+      played.push(id);
+      localStorage.setItem('wordle-played', JSON.stringify(played));
+    }
+  }
+
   function init() {
     boardEl = document.getElementById('wordle-board');
     messageEl = document.getElementById('wordle-message');
     keyboardEl = document.getElementById('wordle-keyboard');
     newGameBtn = document.getElementById('wordle-new-game');
+    pickerEl = document.getElementById('wordle-picker');
+    gameEl = document.getElementById('wordle-game');
+    puzzleGridEl = document.getElementById('wordle-puzzle-grid');
 
     buildKeyboard();
-    newGameBtn.addEventListener('click', newGame);
+    newGameBtn.addEventListener('click', showPicker);
 
     // Listen for physical keyboard input
     document.addEventListener('keydown', handleKeydown);
 
-    newGame();
+    renderPicker();
   }
 
-  function newGame() {
-    // Pick a random answer
-    answer = WORDLE_ANSWERS[Math.floor(Math.random() * WORDLE_ANSWERS.length)].toUpperCase();
+  // --------------------------------------------------------
+  // PUZZLE PICKER
+  // --------------------------------------------------------
+
+  function renderPicker() {
+    const completed = getCompletedIds();
+    const played = getPlayedIds();
+    puzzleGridEl.innerHTML = '';
+
+    WORDLE_ANSWERS.forEach((word, idx) => {
+      const num = idx + 1;
+      const btn = document.createElement('button');
+      btn.classList.add('puzzle-pick-btn');
+      if (completed.includes(num)) {
+        btn.classList.add('completed');
+      } else if (played.includes(num)) {
+        btn.classList.add('played');
+      }
+      btn.textContent = num;
+      btn.addEventListener('click', () => startPuzzle(num));
+      puzzleGridEl.appendChild(btn);
+    });
+  }
+
+  function showPicker() {
+    gameEl.classList.add('hidden');
+    pickerEl.classList.remove('hidden');
+    renderPicker();
+  }
+
+  function startPuzzle(num) {
+    puzzleIndex = num;
+    answer = WORDLE_ANSWERS[num - 1].toUpperCase();
+
+    pickerEl.classList.add('hidden');
+    gameEl.classList.remove('hidden');
+
     guesses = [];
     currentGuess = '';
     gameOver = false;
@@ -137,6 +201,9 @@ const Wordle = (() => {
   function handleKeydown(e) {
     // Only handle keys when Wordle screen is active
     if (!document.getElementById('wordle-screen').classList.contains('active')) return;
+    // Don't handle keys when picker is visible
+    if (!pickerEl.classList.contains('hidden') && !gameEl.classList.contains('hidden') === false) return;
+    if (pickerEl && !pickerEl.classList.contains('hidden')) return;
 
     if (e.key === 'Enter') handleInput('ENTER');
     else if (e.key === 'Backspace') handleInput('DEL');
@@ -278,6 +345,11 @@ const Wordle = (() => {
     gameOver = true;
     newGameBtn.classList.remove('hidden');
 
+    if (won) {
+      saveCompleted(puzzleIndex);
+    }
+    savePlayed(puzzleIndex);
+
     // Save stats to localStorage
     const stats = JSON.parse(localStorage.getItem('wordle-stats') || '{"played":0,"won":0,"distribution":[0,0,0,0,0,0]}');
     stats.played++;
@@ -288,6 +360,10 @@ const Wordle = (() => {
     localStorage.setItem('wordle-stats', JSON.stringify(stats));
   }
 
+  function isInGame() {
+    return gameEl && !gameEl.classList.contains('hidden');
+  }
+
   // Public API - init is called by app.js when navigating to Wordle
-  return { init, newGame };
+  return { init, showPicker, isInGame };
 })();
