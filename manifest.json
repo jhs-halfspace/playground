@@ -1,7 +1,7 @@
 {
-  "name": "Word Games",
-  "short_name": "WordGames",
-  "description": "Wordle and Connections-style word games",
+  "name": "Games",
+  "short_name": "Games",
+  "description": "Wordle, Connections, and Balatro-style games",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",

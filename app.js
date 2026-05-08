@@ -25,7 +25,8 @@ if ('serviceWorker' in navigator) {
 const screens = {
   home: document.getElementById('home-screen'),
   wordle: document.getElementById('wordle-screen'),
-  connections: document.getElementById('connections-screen')
+  connections: document.getElementById('connections-screen'),
+  balatro: document.getElementById('balatro-screen')
 };
 
 const headerTitle = document.getElementById('header-title');
@@ -33,16 +34,18 @@ const backBtn = document.getElementById('back-btn');
 
 let wordleInitialized = false;
 let connectionsInitialized = false;
+let balatroInitialized = false;
 
 function showScreen(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
 
   if (name === 'home') {
-    headerTitle.textContent = 'Word Games';
+    headerTitle.textContent = 'Games';
     backBtn.classList.add('hidden');
   } else {
-    headerTitle.textContent = name === 'wordle' ? 'Wordle' : 'Connections';
+    const titles = { wordle: 'Wordle', connections: 'Connections', balatro: 'Balatro' };
+    headerTitle.textContent = titles[name] || name;
     backBtn.classList.remove('hidden');
   }
 }
@@ -59,6 +62,10 @@ document.querySelectorAll('.game-card').forEach(card => {
     if (game === 'connections' && !connectionsInitialized) {
       Connections.init();
       connectionsInitialized = true;
+    }
+    if (game === 'balatro' && !balatroInitialized) {
+      Balatro.init();
+      balatroInitialized = true;
     }
   });
 });

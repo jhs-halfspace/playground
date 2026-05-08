@@ -1,6 +1,6 @@
 // Version this cache so we can force updates when we deploy new code.
 // Change this string whenever you update the app files.
-const CACHE_NAME = 'word-games-v6';
+const CACHE_NAME = 'word-games-v7';
 
 // List every file the app needs to work offline.
 // The service worker will download and cache all of these on first visit.
@@ -11,6 +11,7 @@ const ASSETS_TO_CACHE = [
   './app.js',
   './wordle.js',
   './connections.js',
+  './balatro.js',
   './words.js',
   './manifest.json',
   './icon-192.png',
