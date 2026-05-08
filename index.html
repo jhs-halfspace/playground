@@ -6,7 +6,7 @@
   <!-- This meta tag is critical for mobile. Without it, your phone browser
        will render the page at desktop width and zoom out, making everything tiny.
        "viewport-fit=cover" lets the app extend into the notch area on iPhones. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
   <title>Word Games</title>
 
@@ -54,14 +54,23 @@
 
   <!-- CONNECTIONS SCREEN -->
   <main id="connections-screen" class="screen">
-    <div id="connections-solved"></div>
-    <div id="connections-board"></div>
-    <div id="connections-mistakes"></div>
-    <div id="connections-controls">
-      <button id="connections-deselect" class="ctrl-btn">Deselect All</button>
-      <button id="connections-submit" class="ctrl-btn primary">Submit</button>
+    <!-- Puzzle Picker -->
+    <div id="connections-picker">
+      <p class="picker-label">Choose a puzzle</p>
+      <div id="connections-puzzle-grid"></div>
     </div>
-    <button id="connections-new-game" class="new-game-btn hidden">New Game</button>
+    <!-- Game View (hidden until a puzzle is picked) -->
+    <div id="connections-game" class="hidden">
+      <div id="connections-solved"></div>
+      <div id="connections-board"></div>
+      <div id="connections-mistakes"></div>
+      <div id="connections-controls">
+        <button id="connections-shuffle" class="ctrl-btn">Shuffle</button>
+        <button id="connections-deselect" class="ctrl-btn">Deselect All</button>
+        <button id="connections-submit" class="ctrl-btn primary">Submit</button>
+      </div>
+      <button id="connections-new-game" class="new-game-btn hidden">Back to Puzzles</button>
+    </div>
   </main>
 
   <!-- Load scripts in order: data first, then game logic, then the app shell -->

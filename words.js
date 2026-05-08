@@ -277,5 +277,95 @@ const CONNECTIONS_PUZZLES = [
       { name: 'Things with keys', words: ['PIANO', 'LAPTOP', 'LOCK', 'MAP'], difficulty: 2 },
       { name: 'Words after "back"', words: ['FIRE', 'BONE', 'TRACK', 'YARD'], difficulty: 3 }
     ]
+  },
+  {
+    id: 9,
+    groups: [
+      { name: 'Steal', words: ['SWIPE', 'LIFT', 'PINCH', 'NICK'], difficulty: 0 },
+      { name: 'Small amount', words: ['DASH', 'DROP', 'TOUCH', 'HINT'], difficulty: 1 },
+      { name: '___ light', words: ['FLASH', 'LIME', 'HIGH', 'STOP'], difficulty: 2 },
+      { name: 'Cocktails', words: ['GIMLET', 'SLING', 'JULEP', 'FIZZ'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 10,
+    groups: [
+      { name: 'Trust as real', words: ['ACCEPT', 'BELIEVE', 'BUY', 'SWALLOW'], difficulty: 0 },
+      { name: 'Power issues', words: ['OUTAGE', 'SHORT', 'SPIKE', 'SURGE'], difficulty: 1 },
+      { name: 'Summary', words: ['ABSTRACT', 'BRIEF', 'DIGEST', 'OUTLINE'], difficulty: 2 },
+      { name: 'Sounds like a first name', words: ['CURT', 'HAIRY', 'KNEEL', 'WANE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 11,
+    groups: [
+      { name: 'Old saying', words: ['ADAGE', 'CHESTNUT', 'MAXIM', 'SAW'], difficulty: 0 },
+      { name: 'Fuel for grilling', words: ['CHARCOAL', 'ELECTRIC', 'GAS', 'WOOD'], difficulty: 1 },
+      { name: 'Also a tree', words: ['ASH', 'CHERRY', 'EBONY', 'GUM'], difficulty: 2 },
+      { name: 'Hot tub parts', words: ['FILTER', 'HEATER', 'JET', 'PUMP'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 12,
+    groups: [
+      { name: 'Deplete', words: ['DRAIN', 'EMPTY', 'EXHAUST', 'SAP'], difficulty: 0 },
+      { name: 'Play music with passion', words: ['GROOVE', 'JAM', 'ROCK', 'SHRED'], difficulty: 1 },
+      { name: 'On a restaurant receipt', words: ['SIGNATURE', 'TAX', 'TIP', 'TOTAL'], difficulty: 2 },
+      { name: 'Forms of sugar', words: ['CUBE', 'GRAIN', 'POWDER', 'SYRUP'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 13,
+    groups: [
+      { name: 'Reward from hard work', words: ['FRUIT', 'RETURN', 'REWARD', 'YIELD'], difficulty: 0 },
+      { name: 'Types of bagels', words: ['EGG', 'EVERYTHING', 'PLAIN', 'POPPY'], difficulty: 1 },
+      { name: 'Contribute to a movie', words: ['ACT', 'DIRECT', 'PRODUCE', 'WRITE'], difficulty: 2 },
+      { name: 'Start of a classic monster', words: ['FRANK', 'MUM', 'VAMP', 'WERE'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 14,
+    groups: [
+      { name: 'Embodiment', words: ['EXAMPLE', 'IDEAL', 'MODEL', 'SYMBOL'], difficulty: 0 },
+      { name: 'Related to trains', words: ['CAR', 'CONDUCTOR', 'STATION', 'TRACK'], difficulty: 1 },
+      { name: 'Electric ___', words: ['CHAIR', 'EEL', 'FENCE', 'SLIDE'], difficulty: 2 },
+      { name: 'Ear___', words: ['DRUM', 'MARK', 'WAX', 'WIG'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 15,
+    groups: [
+      { name: 'Effortless', words: ['FLUID', 'GRACEFUL', 'NATURAL', 'SMOOTH'], difficulty: 0 },
+      { name: 'Exertion', words: ['EFFORT', 'LABOR', 'SWEAT', 'WORK'], difficulty: 1 },
+      { name: 'Energy for a device', words: ['BATTERY', 'CHARGE', 'JUICE', 'POWER'], difficulty: 2 },
+      { name: 'What "pop" might mean', words: ['BURST', 'DAD', 'MAINSTREAM', 'SODA'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 16,
+    groups: [
+      { name: 'Slang for head', words: ['COCONUT', 'CROWN', 'DOME', 'NOGGIN'], difficulty: 0 },
+      { name: 'Palindromes', words: ['KAYAK', 'LEVEL', 'CIVIC', 'RADAR'], difficulty: 1 },
+      { name: 'TV police procedurals', words: ['BONES', 'CASTLE', 'MONK', 'COLUMBO'], difficulty: 2 },
+      { name: 'First in a comedy duo', words: ['ABBOTT', 'KEY', 'LAUREL', 'PENN'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 17,
+    groups: [
+      { name: 'Yellow-brown shades', words: ['BEIGE', 'CAMEL', 'KHAKI', 'TAN'], difficulty: 0 },
+      { name: 'Fail to attend', words: ['CUT', 'DITCH', 'MISS', 'SKIP'], difficulty: 1 },
+      { name: 'Decisive victory', words: ['BLOWOUT', 'ROMP', 'ROUT', 'SWEEP'], difficulty: 2 },
+      { name: '___ wheel', words: ['CHEESE', 'COLOR', 'HAMSTER', 'PRAYER'], difficulty: 3 }
+    ]
+  },
+  {
+    id: 18,
+    groups: [
+      { name: 'Sanctuary', words: ['HAVEN', 'PORT', 'RETREAT', 'SHELTER'], difficulty: 0 },
+      { name: 'Football gear', words: ['CLEATS', 'HELMET', 'JERSEY', 'PADS'], difficulty: 1 },
+      { name: 'Candy brands', words: ['CHARMS', 'KINDER', 'WONKA', 'YORK'], difficulty: 2 },
+      { name: 'Free ___', words: ['BIRD', 'FALL', 'SOLO', 'WILLY'], difficulty: 3 }
+    ]
   }
 ];

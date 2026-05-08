@@ -18,6 +18,8 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  /* Prevent double-tap zoom on mobile */
+  touch-action: manipulation;
 }
 
 /* ============================================================
@@ -281,6 +283,7 @@ header h1 {
   text-align: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: background 0.15s, transform 0.1s;
   word-break: break-word;
 }
@@ -347,4 +350,68 @@ header h1 {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* ============================================================
+   CONNECTIONS PUZZLE PICKER
+   ============================================================ */
+
+#connections-picker {
+  width: 100%;
+}
+
+.picker-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #787c7e;
+}
+
+#connections-puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.puzzle-pick-btn {
+  aspect-ratio: 1;
+  border: 2px solid #d3d6da;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.puzzle-pick-btn:hover,
+.puzzle-pick-btn:active {
+  border-color: #538d4e;
+}
+
+.puzzle-pick-btn.completed {
+  background: #e8f5e6;
+  border-color: #6aaa64;
+}
+
+.puzzle-pick-btn.completed::after {
+  content: '\2713';
+  font-size: 0.8rem;
+  color: #6aaa64;
+}
+
+#connections-game {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

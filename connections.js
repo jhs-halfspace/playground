@@ -3,7 +3,7 @@
 // ============================================================
 //
 // How it works:
-// 1. A puzzle with 4 groups of 4 words is chosen at random.
+// 1. The player picks a numbered puzzle from the picker grid.
 // 2. All 16 words are shuffled and displayed in a 4x4 grid.
 // 3. The player selects 4 words they think belong together
 //    and hits "Submit".
@@ -21,11 +21,20 @@ const Connections = (() => {
   let remainingWords = [];  // Words still on the board
 
   // DOM references
-  let boardEl, solvedEl, mistakesEl, submitBtn, deselectBtn, newGameBtn;
+  let boardEl, solvedEl, mistakesEl, submitBtn, deselectBtn, shuffleBtn, newGameBtn;
+  let pickerEl, gameEl, puzzleGridEl;
 
-  // Track which puzzle IDs have been played
-  function getPlayedIds() {
-    return JSON.parse(localStorage.getItem('connections-played') || '[]');
+  // Track which puzzle IDs have been completed (won)
+  function getCompletedIds() {
+    return JSON.parse(localStorage.getItem('connections-completed') || '[]');
+  }
+
+  function saveCompleted(id) {
+    const completed = getCompletedIds();
+    if (!completed.includes(id)) {
+      completed.push(id);
+      localStorage.setItem('connections-completed', JSON.stringify(completed));
+    }
   }
 
   function init() {
@@ -34,25 +43,50 @@ const Connections = (() => {
     mistakesEl = document.getElementById('connections-mistakes');
     submitBtn = document.getElementById('connections-submit');
     deselectBtn = document.getElementById('connections-deselect');
+    shuffleBtn = document.getElementById('connections-shuffle');
     newGameBtn = document.getElementById('connections-new-game');
+    pickerEl = document.getElementById('connections-picker');
+    gameEl = document.getElementById('connections-game');
+    puzzleGridEl = document.getElementById('connections-puzzle-grid');
 
     submitBtn.addEventListener('click', submitGuess);
     deselectBtn.addEventListener('click', deselectAll);
-    newGameBtn.addEventListener('click', newGame);
+    shuffleBtn.addEventListener('click', shuffleBoard);
+    newGameBtn.addEventListener('click', showPicker);
 
-    newGame();
+    renderPicker();
   }
 
-  function newGame() {
-    // Pick a puzzle the player hasn't seen yet (if possible)
-    const played = getPlayedIds();
-    let available = CONNECTIONS_PUZZLES.filter(p => !played.includes(p.id));
-    if (available.length === 0) {
-      // All puzzles played - reset and allow replays
-      localStorage.setItem('connections-played', '[]');
-      available = CONNECTIONS_PUZZLES;
-    }
-    puzzle = available[Math.floor(Math.random() * available.length)];
+  // --------------------------------------------------------
+  // PUZZLE PICKER
+  // --------------------------------------------------------
+
+  function renderPicker() {
+    const completed = getCompletedIds();
+    puzzleGridEl.innerHTML = '';
+
+    CONNECTIONS_PUZZLES.forEach(p => {
+      const btn = document.createElement('button');
+      btn.classList.add('puzzle-pick-btn');
+      if (completed.includes(p.id)) btn.classList.add('completed');
+      btn.textContent = p.id;
+      btn.addEventListener('click', () => startPuzzle(p.id));
+      puzzleGridEl.appendChild(btn);
+    });
+  }
+
+  function showPicker() {
+    gameEl.classList.add('hidden');
+    pickerEl.classList.remove('hidden');
+    renderPicker();
+  }
+
+  function startPuzzle(id) {
+    puzzle = CONNECTIONS_PUZZLES.find(p => p.id === id);
+    if (!puzzle) return;
+
+    pickerEl.classList.add('hidden');
+    gameEl.classList.remove('hidden');
 
     // Collect and shuffle all 16 words
     remainingWords = puzzle.groups.flatMap(g => g.words);
@@ -80,6 +114,12 @@ const Connections = (() => {
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
+  }
+
+  function shuffleBoard() {
+    if (gameOver) return;
+    shuffle(remainingWords);
+    renderBoard();
   }
 
   // --------------------------------------------------------
@@ -212,12 +252,13 @@ const Connections = (() => {
       mistakesEl.textContent = 'Better luck next time!';
     } else {
       mistakesEl.textContent = mistakes === 0 ? 'Perfect!' : 'Well done!';
+      saveCompleted(puzzle.id);
     }
 
     newGameBtn.classList.remove('hidden');
 
     // Save played puzzle
-    const played = getPlayedIds();
+    const played = JSON.parse(localStorage.getItem('connections-played') || '[]');
     if (!played.includes(puzzle.id)) {
       played.push(puzzle.id);
       localStorage.setItem('connections-played', JSON.stringify(played));
@@ -230,5 +271,5 @@ const Connections = (() => {
     localStorage.setItem('connections-stats', JSON.stringify(stats));
   }
 
-  return { init, newGame };
+  return { init };
 })();
