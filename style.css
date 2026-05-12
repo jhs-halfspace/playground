@@ -650,6 +650,13 @@ body[data-screen="balatro"] .header-btn {
   text-align: center;
 }
 
+.bal-resume-btn {
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(200, 170, 110, 0.4) !important;
+  color: #e8e6d9 !important;
+}
+
 #bal-menu,
 #bal-gameover {
   display: flex;

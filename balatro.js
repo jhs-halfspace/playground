@@ -15,6 +15,42 @@ const Balatro = (() => {
   function show(el) { if (el) el.classList.remove('hidden'); }
   function hide(el) { if (el) el.classList.add('hidden'); }
 
+  const SAVE_KEY = 'balatro-save';
+
+  // ============================================================
+  // SAVE / RESUME
+  // ============================================================
+
+  function saveState() {
+    // Only save during active game phases (not menu or gameover)
+    if (!state || state.phase === 'menu' || state.phase === 'gameover') {
+      localStorage.removeItem(SAVE_KEY);
+      return;
+    }
+    try {
+      // Convert Set to Array for JSON serialization
+      const toSave = Object.assign({}, state, {
+        selected: [...(state.selected || [])],
+      });
+      localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+    } catch (e) { /* storage full or private mode — silently fail */ }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      const loaded = JSON.parse(raw);
+      // Restore Set from Array
+      loaded.selected = new Set(loaded.selected || []);
+      return loaded;
+    } catch (e) { return null; }
+  }
+
+  function clearSave() {
+    localStorage.removeItem(SAVE_KEY);
+  }
+
   // ============================================================
   // INIT
   // ============================================================
@@ -22,7 +58,14 @@ const Balatro = (() => {
   function init() {
     cacheDom();
     bindEvents();
-    state = E.freshState();
+
+    // Check for saved game
+    const saved = loadState();
+    if (saved && saved.phase && saved.phase !== 'menu' && saved.phase !== 'gameover') {
+      state = saved;
+    } else {
+      state = E.freshState();
+    }
     render();
   }
 
@@ -69,10 +112,12 @@ const Balatro = (() => {
 
   function bindEvents() {
     document.getElementById('bal-new-run').addEventListener('click', () => {
+      clearSave();
       E.startRun(state);
       render();
     });
     document.getElementById('bal-restart').addEventListener('click', () => {
+      clearSave();
       state = E.freshState();
       E.startRun(state);
       render();
@@ -114,6 +159,39 @@ const Balatro = (() => {
   }
 
   // ============================================================
+  // MENU (with resume button)
+  // ============================================================
+
+  function renderMenu() {
+    // Show or hide the resume button based on saved game
+    let resumeBtn = document.getElementById('bal-resume-run');
+    if (!resumeBtn) {
+      // Create resume button dynamically (inserted after New Run)
+      const newRunBtn = document.getElementById('bal-new-run');
+      resumeBtn = document.createElement('button');
+      resumeBtn.id = 'bal-resume-run';
+      resumeBtn.className = 'new-game-btn bal-resume-btn';
+      resumeBtn.textContent = 'Resume Run';
+      resumeBtn.addEventListener('click', () => {
+        const saved = loadState();
+        if (saved) {
+          state = saved;
+          render();
+        }
+      });
+      newRunBtn.parentNode.insertBefore(resumeBtn, newRunBtn.nextSibling);
+    }
+
+    const saved = loadState();
+    if (saved && saved.phase && saved.phase !== 'menu' && saved.phase !== 'gameover') {
+      resumeBtn.textContent = 'Resume Run (Ante ' + saved.ante + ')';
+      show(resumeBtn);
+    } else {
+      hide(resumeBtn);
+    }
+  }
+
+  // ============================================================
   // RENDER DISPATCH
   // ============================================================
 
@@ -123,7 +201,7 @@ const Balatro = (() => {
     sections.forEach(s => hide(s));
 
     switch (state.phase) {
-      case 'menu': show(dom.menu); break;
+      case 'menu': show(dom.menu); renderMenu(); break;
       case 'deckSelect': show(dom.deckSelect); renderDeckSelect(); break;
       case 'blindSelect': show(dom.blindSelect); renderBlindSelect(); break;
       case 'playing': show(dom.game); renderGame(); break;
@@ -132,6 +210,9 @@ const Balatro = (() => {
       case 'packOpen': show(dom.packOpen); renderPackOpen(); break;
       case 'gameover': show(dom.gameover); renderGameOver(); break;
     }
+
+    // Auto-save after every state change
+    saveState();
   }
 
   // ============================================================
@@ -851,6 +932,7 @@ const Balatro = (() => {
     if (state.phase !== 'playing') return;
     E.discardCards(state);
     renderGame();
+    saveState();
   }
 
   return { init };

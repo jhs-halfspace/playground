@@ -721,21 +721,23 @@ const BalatroEngine = (() => {
     state.money += result.earnedMoney;
     state.hands--;
 
-    // Fire joker onHandPlayed hooks
-    state.jokers.forEach((ji, idx) => {
-      const def = resolveJokerDef(state, ji, idx);
-      if (def && def.onHandPlayed) def.onHandPlayed(state, ji.vars, handType, result.scoringCards);
-    });
-
-    // Boss onHandPlayed
-    if (boss && boss.onHandPlayed) boss.onHandPlayed(state, playedCards, handType);
-
-    // Remove played cards from hand, draw replacements
+    // Remove played cards from hand FIRST, then draw replacements.
+    // This must happen before boss/joker onHandPlayed hooks which may
+    // further modify the hand (e.g., The Hook discards 2 more cards).
     const remaining = state.hand.filter((_, i) => !state.selected.has(i));
     const drawCount = Math.min(indices.length, state.drawPile.length);
     const drawn = state.drawPile.splice(0, drawCount);
     state.hand = [...remaining, ...drawn];
     state.selected = new Set();
+
+    // Fire joker onHandPlayed hooks (after card replacement)
+    state.jokers.forEach((ji, idx) => {
+      const def = resolveJokerDef(state, ji, idx);
+      if (def && def.onHandPlayed) def.onHandPlayed(state, ji.vars, handType, result.scoringCards);
+    });
+
+    // Boss onHandPlayed (after card replacement — e.g., The Hook discards from new hand)
+    if (boss && boss.onHandPlayed) boss.onHandPlayed(state, playedCards, handType);
 
     // Glass card destruction
     playedCards.forEach(card => {
