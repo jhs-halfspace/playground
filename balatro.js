@@ -216,7 +216,7 @@ const Balatro = (() => {
           const selectBtn = el.querySelector('.bal-select-btn');
           const skipBtn = el.querySelector('.bal-skip-btn');
           if (selectBtn) selectBtn.addEventListener('click', () => { E.selectBlind(state); render(); });
-          if (skipBtn) skipBtn.addEventListener('click', () => { E.skipBlind(state); render(); });
+          if (skipBtn) skipBtn.addEventListener('click', () => doSkipBlind());
         }, 0);
       }
 
@@ -749,6 +749,29 @@ const Balatro = (() => {
       }
       render();
     }, 1400);
+  }
+
+  function doSkipBlind() {
+    const skippedName = D.BLIND_NAMES[state.blind];
+    const tag = E.skipBlind(state);
+
+    if (tag) {
+      // Show tag reward notification before advancing
+      const container = document.getElementById('bal-blind-options');
+      if (container) {
+        container.innerHTML =
+          '<div class="bal-tag-reward">' +
+            '<div class="tag-reward-title">Skipped ' + skippedName + '</div>' +
+            '<div class="tag-reward-name">' + tag.name + '</div>' +
+            '<div class="tag-reward-desc">' + tag.desc + '</div>' +
+          '</div>';
+        setTimeout(() => render(), 1800);
+      } else {
+        render();
+      }
+    } else {
+      render();
+    }
   }
 
   function doDiscard() {

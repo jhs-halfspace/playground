@@ -618,17 +618,21 @@ const BalatroEngine = (() => {
       return true;
     });
     const tag = tagPool[Math.floor(Math.random() * tagPool.length)];
+    let awardedTag = null;
     if (tag) {
-      // Apply immediate tags
+      awardedTag = tag;
+      // Apply immediate tags (money, jokers, etc.)
       if (tag.apply) tag.apply(state);
-      // Store shop-affecting tags
+      // Store shop-affecting tags for next shop visit
       if (tag.onShopEnter) state.tags.push({ id: tag.id });
     }
 
     // Advance blind
     state.blind++;
-    if (state.blind > 2) { state.blind = 0; state.ante++; }
+    if (state.blind > 2) { state.blind = 0; state.ante++; state.anteBoss = null; }
     state.phase = 'blindSelect';
+
+    return awardedTag;
   }
 
   function applyBossDebuffs(state) {

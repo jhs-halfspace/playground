@@ -1416,6 +1416,35 @@ body[data-screen="balatro"] .header-btn {
   width: 100%;
 }
 
+.bal-tag-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  width: 100%;
+  animation: bal-pop 0.3s ease;
+}
+
+.tag-reward-title {
+  font-size: 0.85rem;
+  color: #a8b5a0;
+}
+
+.tag-reward-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.tag-reward-desc {
+  font-size: 0.9rem;
+  color: #e8e6d9;
+  text-align: center;
+}
+
 .bal-tags-display {
   font-size: 0.8rem;
   color: #a8b5a0;
