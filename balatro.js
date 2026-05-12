@@ -91,6 +91,18 @@ const Balatro = (() => {
       renderGame();
     });
 
+    document.getElementById('bal-run-info-btn').addEventListener('click', () => {
+      renderHandInfo();
+      show(document.getElementById('bal-hand-info'));
+    });
+    document.getElementById('bal-hand-info-close').addEventListener('click', () => {
+      hide(document.getElementById('bal-hand-info'));
+    });
+    // Close on backdrop click
+    document.getElementById('bal-hand-info').addEventListener('click', (e) => {
+      if (e.target.id === 'bal-hand-info') hide(e.target);
+    });
+
     dom.rerollBtn.addEventListener('click', () => {
       E.rerollShop(state);
       renderShop();
@@ -387,6 +399,34 @@ const Balatro = (() => {
     } else {
       dom.handType.textContent = '';
     }
+  }
+
+  function renderHandInfo() {
+    const list = document.getElementById('bal-hand-info-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    D.HAND_TYPES.forEach(ht => {
+      // Skip secret hands the player hasn't discovered yet
+      if (ht.secret && !state.secretHandsPlayed[ht.name]) return;
+
+      const level = E.getHandLevel(state, ht.name);
+      const { chips, mult } = E.getHandChipsMult(state, ht.name);
+      const playCount = state.handsPlayedRun[ht.name] || 0;
+
+      const row = document.createElement('div');
+      row.className = 'hand-info-row' + (level > 1 ? ' leveled' : '');
+      row.innerHTML =
+        '<div class="hand-info-name">' + ht.name + '</div>' +
+        '<div class="hand-info-level">lvl ' + level + '</div>' +
+        '<div class="hand-info-stats">' +
+          '<span class="ht-chip-badge">' + chips + '</span>' +
+          '<span class="ht-x">\u00d7</span>' +
+          '<span class="ht-mult-badge">' + mult + '</span>' +
+        '</div>' +
+        '<div class="hand-info-plays">' + playCount + ' played</div>';
+      list.appendChild(row);
+    });
   }
 
   function renderConsumables() {
