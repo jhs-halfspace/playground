@@ -1106,7 +1106,14 @@ body[data-screen="balatro"] .header-btn {
   font-size: 0.78rem;
 }
 
-.ht-x { color: #a8b5a0; font-size: 0.8rem; }
+.ht-x, .ht-eq { color: #a8b5a0; font-size: 0.8rem; }
+
+.ht-total {
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+}
 
 /* Controls */
 

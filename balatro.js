@@ -370,14 +370,20 @@ const Balatro = (() => {
     const selectedCards = [...state.selected].map(i => state.hand[i]);
     const handType = E.evaluateHand(selectedCards, state);
     if (handType) {
-      const { chips, mult } = E.getHandChipsMult(state, handType);
-      const level = E.getHandLevel(state, handType);
-      dom.handType.innerHTML =
-        '<span class="ht-name">' + handType + '</span> ' +
-        '<span class="ht-level">lvl ' + level + '</span> ' +
-        '<span class="ht-chip-badge">' + chips + '</span>' +
-        '<span class="ht-x">\u00d7</span>' +
-        '<span class="ht-mult-badge">' + mult + '</span>';
+      // Run the full scoring pipeline on cloned data for a non-destructive preview
+      const preview = E.previewScore(state, selectedCards);
+      if (preview) {
+        dom.handType.innerHTML =
+          '<span class="ht-name">' + preview.handType + '</span> ' +
+          '<span class="ht-level">lvl ' + preview.level + '</span> ' +
+          '<span class="ht-chip-badge">' + preview.chips + '</span>' +
+          '<span class="ht-x">\u00d7</span>' +
+          '<span class="ht-mult-badge">' + preview.mult + '</span>' +
+          '<span class="ht-eq">=</span>' +
+          '<span class="ht-total">' + preview.total.toLocaleString() + '</span>';
+      } else {
+        dom.handType.textContent = '';
+      }
     } else {
       dom.handType.textContent = '';
     }

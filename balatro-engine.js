@@ -276,6 +276,30 @@ const BalatroEngine = (() => {
   // SCORING PIPELINE
   // ============================================================
 
+  // Preview scoring without side effects — uses shallow clones of cards
+  // and joker vars so mutations from hooks don't persist.
+  function previewScore(state, playedCards) {
+    // Clone cards so chipBonus mutations (Hiker) don't persist
+    const clonedCards = playedCards.map(c => Object.assign({}, c));
+    const clonedHand = state.hand.map(c =>
+      playedCards.includes(c) ? clonedCards[playedCards.indexOf(c)] : Object.assign({}, c)
+    );
+    // Clone joker vars so stateful joker mutations don't persist
+    const savedVars = state.jokers.map(j => j.vars ? JSON.parse(JSON.stringify(j.vars)) : {});
+
+    // Temporarily swap hand for scoring context (heldCards derived from state.hand)
+    const origHand = state.hand;
+    state.hand = clonedHand;
+
+    const result = scoreHand(state, clonedCards);
+
+    // Restore originals
+    state.hand = origHand;
+    state.jokers.forEach((j, i) => { j.vars = savedVars[i]; });
+
+    return result;
+  }
+
   function scoreHand(state, playedCards) {
     const handType = evaluateHand(playedCards, state);
     if (!handType) return null;
@@ -1278,7 +1302,7 @@ const BalatroEngine = (() => {
     // Hand eval
     evaluateHand, getScoringCards, getJokerFlags, getHandLevel, getHandChipsMult,
     // Scoring
-    scoreHand, resolveJokerDef,
+    scoreHand, previewScore, resolveJokerDef,
     // State
     freshState,
     // Game flow
