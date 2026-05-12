@@ -172,19 +172,32 @@ const Balatro = (() => {
     if (!container) return;
     container.innerHTML = '';
 
+    // Ensure boss is pre-rolled so we can show it
+    E.ensureAnteBoss(state);
+
     for (let i = 0; i < 3; i++) {
       const name = D.BLIND_NAMES[i];
       const anteBase = D.ANTE_BASES[Math.min(state.ante - 1, D.ANTE_BASES.length - 1)];
       const target = Math.floor(anteBase * D.BLIND_SCORE_MULTS[i]);
       const isCurrent = i === state.blind;
       const isPast = i < state.blind;
+      const reward = D.BLIND_REWARDS[i];
 
       const el = document.createElement('div');
       el.className = 'bal-blind-card' + (isCurrent ? ' current' : '') + (isPast ? ' past' : '');
 
+      // Boss blind info
       let bossDesc = '';
-      if (i === 2) {
-        bossDesc = '<span class="blind-boss-desc">???</span>';
+      if (i === 2 && state.anteBoss) {
+        bossDesc = '<span class="blind-boss-desc">' +
+          state.anteBoss.name + '</span>' +
+          '<span class="blind-boss-effect">' + state.anteBoss.desc + '</span>';
+      }
+
+      // Reward info
+      let rewardHtml = '<span class="blind-reward">Reward: $' + reward + '</span>';
+      if (i < 2 && isCurrent) {
+        rewardHtml += '<span class="blind-skip-info">or skip for a Tag</span>';
       }
 
       el.innerHTML =
@@ -192,9 +205,10 @@ const Balatro = (() => {
         '<div class="blind-ante">Ante ' + state.ante + '</div>' +
         '<div class="blind-target">' + target.toLocaleString() + '</div>' +
         bossDesc +
+        rewardHtml +
         (isCurrent ? '<div class="blind-actions">' +
           (i < 2 ? '<button class="ctrl-btn bal-skip-btn">Skip</button>' : '') +
-          '<button class="ctrl-btn primary bal-select-btn">Select</button>' +
+          '<button class="ctrl-btn primary bal-select-btn">Play</button>' +
         '</div>' : '');
 
       if (isCurrent) {
@@ -209,7 +223,7 @@ const Balatro = (() => {
       container.appendChild(el);
     }
 
-    // Show tags if any
+    // Show owned tags
     if (state.tags.length > 0) {
       const tagEl = document.createElement('div');
       tagEl.className = 'bal-tags-display';
@@ -220,6 +234,15 @@ const Balatro = (() => {
         }).join(' ');
       container.appendChild(tagEl);
     }
+
+    // Show run info (jokers, money, hand levels)
+    const infoEl = document.createElement('div');
+    infoEl.className = 'bal-blind-info-bar';
+    infoEl.innerHTML =
+      '<span class="bal-money">$' + state.money + '</span>' +
+      '<span>Jokers: ' + state.jokers.length + '/' + state.maxJokers + '</span>' +
+      '<span>Deck: ' + state.deck.length + ' cards</span>';
+    container.appendChild(infoEl);
   }
 
   // ============================================================
@@ -361,26 +384,47 @@ const Balatro = (() => {
       else if (cons.type === 'planet') def = D.findPlanet(cons.id);
       else if (cons.type === 'spectral') def = D.findSpectral(cons.id);
 
+      // Check if this consumable can be used right now
+      const selCount = state.selected.size;
+      let canUse = state.phase === 'playing';
+      let selectionHint = '';
+      if (def && def.needsSelection) {
+        const min = def.minCards || 1;
+        const max = def.maxCards || 5;
+        canUse = canUse && selCount >= min && selCount <= max;
+        if (min === max) {
+          selectionHint = 'Select ' + min + ' card' + (min > 1 ? 's' : '');
+        } else {
+          selectionHint = 'Select ' + min + '-' + max + ' cards';
+        }
+      } else if (def && def.canUse) {
+        canUse = canUse && def.canUse(state);
+      }
+
       const el = document.createElement('div');
-      el.className = 'bal-consumable-card ' + cons.type;
+      el.className = 'bal-consumable-card ' + cons.type + (canUse ? ' usable' : '');
       el.innerHTML =
         '<span class="cons-name">' + (def ? def.name : cons.id) + '</span>' +
-        '<span class="cons-type">' + cons.type + '</span>';
+        (selectionHint ? '<span class="cons-hint">' + selectionHint + '</span>' :
+         '<span class="cons-type">' + cons.type + '</span>');
       el.title = def ? def.desc : '';
       el.addEventListener('click', () => {
         if (state.phase !== 'playing') return;
-        // Use consumable
         if (def && def.needsSelection) {
-          // Need card selection — use currently selected cards
           const indices = [...state.selected];
           if (indices.length >= (def.minCards || 1) && indices.length <= (def.maxCards || 5)) {
             E.useConsumable(state, idx, indices);
             state.selected = new Set();
             renderGame();
+          } else {
+            // Show hint
+            dom.message.textContent = selectionHint + ' first, then click ' + (def ? def.name : 'consumable');
+            setTimeout(() => { if (state.phase === 'playing') dom.message.textContent = ''; }, 2000);
           }
         } else {
-          E.useConsumable(state, idx, []);
-          renderGame();
+          if (E.useConsumable(state, idx, [])) {
+            renderGame();
+          }
         }
       });
       dom.consumableArea.appendChild(el);
@@ -678,6 +722,8 @@ const Balatro = (() => {
     state.phase = 'scoring';
     renderGame();
 
+    const moneyEarned = result.earnedMoney > 0 ?
+      '<div class="score-money">+$' + result.earnedMoney + '</div>' : '';
     dom.message.innerHTML =
       '<div class="bal-score-anim">' +
         '<div class="score-hand-name">' + result.handType +
@@ -689,6 +735,7 @@ const Balatro = (() => {
           '<span class="score-eq">=</span>' +
           '<span class="score-total">' + result.total.toLocaleString() + '</span>' +
         '</div>' +
+        moneyEarned +
       '</div>';
 
     setTimeout(() => {

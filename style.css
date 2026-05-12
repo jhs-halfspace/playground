@@ -1385,6 +1385,37 @@ body[data-screen="balatro"] .header-btn {
 
 .bal-skip-btn { color: #a8b5a0 !important; }
 
+.blind-reward {
+  font-size: 0.65rem;
+  color: #ffd700;
+  display: block;
+  margin-top: 4px;
+}
+
+.blind-skip-info {
+  font-size: 0.6rem;
+  color: #a8b5a0;
+  display: block;
+}
+
+.blind-boss-effect {
+  font-size: 0.6rem;
+  color: #ff8a8a;
+  display: block;
+}
+
+.bal-blind-info-bar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #a8b5a0;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(200, 170, 110, 0.15);
+  width: 100%;
+}
+
 .bal-tags-display {
   font-size: 0.8rem;
   color: #a8b5a0;
@@ -1437,6 +1468,18 @@ body[data-screen="balatro"] .header-btn {
 
 .cons-name { font-weight: 700; font-size: 0.65rem; }
 .cons-type { font-size: 0.55rem; opacity: 0.7; text-transform: capitalize; }
+.cons-hint { font-size: 0.5rem; color: #a8b5a0; }
+
+.bal-consumable-card.usable {
+  border-color: #daa520;
+  box-shadow: 0 0 6px rgba(218, 165, 32, 0.3);
+}
+
+.score-money {
+  font-size: 0.8rem;
+  color: #ffd700;
+  margin-top: 2px;
+}
 
 /* ---- Shop sections ---- */
 

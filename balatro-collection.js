@@ -83,7 +83,7 @@
 
     { id: 'the_manacle', name: 'The Manacle',
       desc: '-1 hand size this round',
-      onBlindStart(state) { state.bonusHandSize = (state.bonusHandSize || 0) - 1; } },
+      onBlindStart(state) { state._tempHandSizeMod = (state._tempHandSizeMod || 0) - 1; } },
 
     { id: 'the_serpent', name: 'The Serpent',
       desc: 'Always draw 3 cards after play or discard',
@@ -151,7 +151,7 @@
 
     { id: 'the_violet', name: 'The Violet',
       desc: '-1 hand size this round',
-      onBlindStart(state) { state.bonusHandSize = (state.bonusHandSize || 0) - 1; } },
+      onBlindStart(state) { state._tempHandSizeMod = (state._tempHandSizeMod || 0) - 1; } },
 
     { id: 'the_amber', name: 'The Amber',
       desc: 'No discards this round',
@@ -252,7 +252,7 @@
 
     { id: 'paint_brush', name: 'Paint Brush', tier: 1, cost: 10,
       desc: '+1 hand size',
-      apply(state) { state.bonusHandSize = (state.bonusHandSize || 0) + 1; } },
+      apply(state) { state.permHandSizeBonus = (state.permHandSizeBonus || 0) + 1; } },
 
     // --- Tier 2 (require tier 1) ---
     { id: 'overstock_plus', name: 'Overstock Plus', tier: 2, requires: 'overstock', cost: 10,
@@ -317,7 +317,7 @@
 
     { id: 'palette', name: 'Palette', tier: 2, requires: 'paint_brush', cost: 10,
       desc: '+1 hand size (total +2)',
-      apply(state) { state.bonusHandSize = (state.bonusHandSize || 1) + 1; } },
+      apply(state) { state.permHandSizeBonus = (state.permHandSizeBonus || 1) + 1; } },
   );
 
   // ================================================================
@@ -388,7 +388,7 @@
       isDouble: true },
 
     { id: 'juggle_tag', name: 'Juggle Tag', desc: '+3 hand size next round',
-      apply(state) { state.bonusHandSize = (state.bonusHandSize || 0) + 3; } },
+      apply(state) { state._tempHandSizeMod = (state._tempHandSizeMod || 0) + 3; } },
 
     { id: 'orbital_tag', name: 'Orbital Tag', desc: 'Upgrades a random poker hand by 3 levels',
       apply(state) {
@@ -480,7 +480,7 @@
       } },
 
     { id: 'painted_deck', name: 'Painted Deck', desc: '+2 hand size, -1 Joker slot',
-      apply(state) { state.bonusHandSize = (state.bonusHandSize || 0) + 2; state.maxJokers = Math.max(1, state.maxJokers - 1); } },
+      apply(state) { state.permHandSizeBonus = (state.permHandSizeBonus || 0) + 2; state.maxJokers = Math.max(1, state.maxJokers - 1); } },
 
     { id: 'anaglyph_deck', name: 'Anaglyph Deck', desc: 'Double Tag after each Boss Blind',
       apply(state) { state.anaglyphDeck = true; } },

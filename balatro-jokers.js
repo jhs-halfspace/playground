@@ -463,7 +463,7 @@
 
     { id: 'turtle_bean', name: 'Turtle Bean', desc: '+5 hand size, -1 each round', cost: 6, rarity: 'uncommon',
       initVars() { return { bonus: 5 }; },
-      onBlindSelect(state, vars) { state.bonusHandSize = (state.bonusHandSize || 0) + vars.bonus; },
+      onBlindSelect(state, vars) { state._tempHandSizeMod = (state._tempHandSizeMod || 0) + vars.bonus; },
       onRoundEnd(state, vars) {
         vars.bonus--;
         if (vars.bonus <= 0) {
@@ -500,7 +500,7 @@
       onScore(ctx) { ctx.mult += (ctx.state.tarotsUsed || 0); } },
 
     { id: 'juggler', name: 'Juggler', desc: '+1 hand size', cost: 4, rarity: 'uncommon' },
-    // Effect applied when bought: state.bonusHandSize++
+    // Effect applied when bought: state.permHandSizeBonus++
 
     { id: 'drunkard', name: 'Drunkard', desc: '+1 discard each round', cost: 4, rarity: 'uncommon' },
     // Effect applied at round start: state.discards++

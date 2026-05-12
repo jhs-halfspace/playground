@@ -486,11 +486,12 @@ const BalatroEngine = (() => {
       lastConsumedType: null,
       bonusHands: 0,
       bonusDiscards: 0,
-      bonusHandSize: 0,
+      permHandSizeBonus: 0,  // permanent: Juggler, Stuntman, Paint Brush, etc.
       luckMult: 1,
       shopDiscount: 0,
       unusedDiscards: 0,
       secretHandsPlayed: {},
+      anteBoss: null,         // pre-rolled boss for current ante (for preview)
       _handTypesThisRound: [],
       shopCardSlotCount: 2,
     };
@@ -526,6 +527,16 @@ const BalatroEngine = (() => {
     state.phase = 'blindSelect';
   }
 
+  // Pre-roll boss blind for current ante (called when entering blindSelect)
+  function ensureAnteBoss(state) {
+    if (state.anteBoss) return;
+    if (state.jokers.some(j => j.defId === 'chicot' && !j._debuffed)) {
+      state.anteBoss = { id: null, name: 'Disabled', desc: 'Chicot disables Boss Blinds' };
+    } else {
+      state.anteBoss = D.bossBlinds[Math.floor(Math.random() * D.bossBlinds.length)];
+    }
+  }
+
   function selectBlind(state) {
     state._handTypesThisRound = [];
     state._pillarPlayed = null;
@@ -537,11 +548,15 @@ const BalatroEngine = (() => {
     state.hands = D.GAME.MAX_HANDS + state.bonusHands;
     state.discards = D.GAME.MAX_DISCARDS + state.bonusDiscards;
 
+    // Calculate hand size: base + permanent bonuses + per-round joker bonuses
+    let tempHandSizeBonus = 0;
+
     // Jokers that modify on blind select
     state.jokers.forEach(j => {
-      if (j.defId === 'drunkard' && !j._debuffed) state.discards++;
-      if (j.defId === 'troubadour' && !j._debuffed) { state.bonusHandSize += 2; state.hands--; }
-      if (j.defId === 'merry_andy' && !j._debuffed) { state.discards += 3; state.bonusHandSize--; }
+      if (j._debuffed) return;
+      if (j.defId === 'drunkard') state.discards++;
+      if (j.defId === 'troubadour') { tempHandSizeBonus += 2; state.hands--; }
+      if (j.defId === 'merry_andy') { state.discards += 3; tempHandSizeBonus--; }
     });
 
     // Clamp
@@ -550,13 +565,13 @@ const BalatroEngine = (() => {
 
     // Boss blind effect
     if (state.blind === 2) {
-      // Check Chicot
-      if (state.jokers.some(j => j.defId === 'chicot' && !j._debuffed)) {
-        state.bossEffect = null;
+      ensureAnteBoss(state);
+      if (state.anteBoss && state.anteBoss.id) {
+        state.bossEffect = state.anteBoss.id;
+        const boss = D.findBoss(state.bossEffect);
+        if (boss && boss.onBlindStart) boss.onBlindStart(state);
       } else {
-        const boss = D.bossBlinds[Math.floor(Math.random() * D.bossBlinds.length)];
-        state.bossEffect = boss.id;
-        if (boss.onBlindStart) boss.onBlindStart(state);
+        state.bossEffect = null;
       }
     } else {
       state.bossEffect = null;
@@ -581,7 +596,9 @@ const BalatroEngine = (() => {
 
     // Shuffle and deal
     state.drawPile = shuffle([...state.deck]);
-    const handSize = state.handSize + (state.bonusHandSize || 0);
+    const bossTempSize = state._tempHandSizeMod || 0;
+    state._tempHandSizeMod = 0; // consume temporary mods
+    const handSize = state.handSize + state.permHandSizeBonus + tempHandSizeBonus + bossTempSize;
     state.hand = state.drawPile.splice(0, Math.max(1, handSize));
 
     // Apply boss debuffs to hand
@@ -810,16 +827,9 @@ const BalatroEngine = (() => {
     if (state.blind > 2) {
       state.blind = 0;
       state.ante++;
+      state.anteBoss = null; // Re-roll boss for next ante
       // Anaglyph deck: Double Tag after boss
       if (state.anaglyphDeck) state.tags.push({ id: 'double_tag' });
-    }
-
-    // Reset temporary bonuses
-    state.bonusHandSize = 0;
-    const deckDef = D.findDeck(state.deckId);
-    if (deckDef && deckDef.apply) {
-      // Some deck bonuses are permanent and re-applied
-      if (state.deckId === 'painted_deck') state.bonusHandSize = 2;
     }
 
     state.phase = 'shop';
@@ -995,10 +1005,10 @@ const BalatroEngine = (() => {
       if (inst.edition === 'negative') state.maxJokers++;
       // Oops! All 6s
       if (inst.defId === 'oops_all_6s') state.luckMult = 2;
-      // Juggler
-      if (inst.defId === 'juggler') state.bonusHandSize++;
-      // Stuntman
-      if (inst.defId === 'stuntman') state.bonusHandSize -= 2;
+      // Juggler: permanent +1 hand size
+      if (inst.defId === 'juggler') state.permHandSizeBonus++;
+      // Stuntman: permanent -2 hand size
+      if (inst.defId === 'stuntman') state.permHandSizeBonus -= 2;
     } else if (item.type === 'tarot' || item.type === 'planet' || item.type === 'spectral') {
       if (state.consumables.length >= state.maxConsumables) return false;
       state.money -= cost;
@@ -1257,7 +1267,7 @@ const BalatroEngine = (() => {
     // State
     freshState,
     // Game flow
-    startRun, applyDeckAndStart, selectBlind, skipBlind, playHand, discardCards, endBlind,
+    startRun, applyDeckAndStart, selectBlind, skipBlind, ensureAnteBoss, playHand, discardCards, endBlind,
     // Shop
     generateShop, buyShopItem, buyVoucher, buyPack, sellJoker, sellConsumable,
     useConsumable, rerollShop, nextRound,

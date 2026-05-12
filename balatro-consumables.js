@@ -340,7 +340,7 @@
       apply(state) {
         const rank = D.RANKS[Math.floor(Math.random() * D.RANKS.length)];
         state.hand.forEach(c => { c.rank = rank; });
-        state.bonusHandSize = (state.bonusHandSize || 0) - 1;
+        state.permHandSizeBonus = (state.permHandSizeBonus || 0) - 1;
       } },
 
     { id: 'ectoplasm', name: 'Ectoplasm',
@@ -352,7 +352,7 @@
           j.edition = 'negative';
           state.maxJokers++;
         }
-        state.bonusHandSize = (state.bonusHandSize || 0) - 1;
+        state.permHandSizeBonus = (state.permHandSizeBonus || 0) - 1;
       } },
 
     { id: 'immolate', name: 'Immolate',
