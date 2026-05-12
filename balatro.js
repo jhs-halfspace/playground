@@ -440,10 +440,13 @@ const Balatro = (() => {
       else if (cons.type === 'spectral') def = D.findSpectral(cons.id);
 
       // Check if this consumable can be used right now
+      // Consumables that need card selection require 'playing' phase (hand visible).
+      // Others (planets, non-selection tarots/spectrals) can be used anytime.
       const selCount = state.selected.size;
-      let canUse = state.phase === 'playing';
+      const needsHand = def && def.needsSelection;
+      let canUse = needsHand ? state.phase === 'playing' : true;
       let selectionHint = '';
-      if (def && def.needsSelection) {
+      if (needsHand) {
         const min = def.minCards || 1;
         const max = def.maxCards || 5;
         canUse = canUse && selCount >= min && selCount <= max;
@@ -464,15 +467,14 @@ const Balatro = (() => {
          '<span class="cons-type">' + cons.type + '</span>');
       el.title = def ? def.desc : '';
       el.addEventListener('click', () => {
-        if (state.phase !== 'playing') return;
-        if (def && def.needsSelection) {
+        if (needsHand) {
+          if (state.phase !== 'playing') return;
           const indices = [...state.selected];
           if (indices.length >= (def.minCards || 1) && indices.length <= (def.maxCards || 5)) {
             E.useConsumable(state, idx, indices);
             state.selected = new Set();
             renderGame();
           } else {
-            // Show hint
             dom.message.textContent = selectionHint + ' first, then click ' + (def ? def.name : 'consumable');
             setTimeout(() => { if (state.phase === 'playing') dom.message.textContent = ''; }, 2000);
           }
@@ -648,7 +650,7 @@ const Balatro = (() => {
     // Owned jokers
     renderJokerRow(dom.ownedJokers, state.jokers, true);
 
-    // Owned consumables
+    // Owned consumables (can use non-selection ones directly, or sell)
     if (dom.ownedConsumables) {
       dom.ownedConsumables.innerHTML = '';
       state.consumables.forEach((cons, idx) => {
@@ -656,15 +658,31 @@ const Balatro = (() => {
         if (cons.type === 'tarot') def = D.findTarot(cons.id);
         else if (cons.type === 'planet') def = D.findPlanet(cons.id);
         else if (cons.type === 'spectral') def = D.findSpectral(cons.id);
+
+        const canUseHere = def && !def.needsSelection && (!def.canUse || def.canUse(state));
         const el = document.createElement('div');
-        el.className = 'bal-consumable-card ' + cons.type + ' sellable';
+        el.className = 'bal-consumable-card ' + cons.type + (canUseHere ? ' usable' : '');
         el.innerHTML =
           '<span class="cons-name">' + (def ? def.name : cons.id) + '</span>' +
-          '<span class="joker-sell">Sell $1</span>';
-        el.addEventListener('click', () => {
+          (canUseHere
+            ? '<span class="cons-use-hint">Tap to use</span>'
+            : '<span class="cons-type">' + cons.type + '</span>');
+        el.title = def ? def.desc : '';
+
+        if (canUseHere) {
+          el.addEventListener('click', () => {
+            E.useConsumable(state, idx, []);
+            renderShop();
+          });
+        }
+
+        // Long press / right-click to sell
+        el.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
           E.sellConsumable(state, idx);
           renderShop();
         });
+
         dom.ownedConsumables.appendChild(el);
       });
     }

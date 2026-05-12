@@ -19,11 +19,18 @@
 
   D.bossBlinds.push(
     { id: 'the_hook', name: 'The Hook',
-      desc: 'Discards 2 random cards per hand played',
+      desc: 'Discards 2 random cards from hand each hand played',
       onHandPlayed(state) {
-        for (let i = 0; i < 2 && state.hand.length > 0; i++) {
+        // Discard 2 random cards and draw replacements (like a forced discard)
+        let toDiscard = Math.min(2, state.hand.length);
+        for (let i = 0; i < toDiscard; i++) {
           const idx = Math.floor(Math.random() * state.hand.length);
           state.hand.splice(idx, 1);
+        }
+        // Draw replacements from draw pile
+        const drawCount = Math.min(toDiscard, state.drawPile.length);
+        for (let i = 0; i < drawCount; i++) {
+          state.hand.push(state.drawPile.shift());
         }
       } },
 
