@@ -537,6 +537,20 @@ const BalatroEngine = (() => {
     }
   }
 
+  // Pre-roll skip tags for small and big blinds so they can be shown before the player decides
+  function ensureSkipTags(state) {
+    if (state._skipTags) return;
+    const tagPool = D.tags.filter(t => {
+      if (state.ante <= 1 && ['top_up_tag', 'handy_tag', 'garbage_tag', 'negative_tag',
+          'standard_tag', 'meteor_tag', 'buffoon_tag', 'ethereal_tag', 'orbital_tag'].includes(t.id)) return false;
+      return true;
+    });
+    state._skipTags = [
+      tagPool[Math.floor(Math.random() * tagPool.length)],
+      tagPool[Math.floor(Math.random() * tagPool.length)],
+    ];
+  }
+
   function selectBlind(state) {
     state._handTypesThisRound = [];
     state._pillarPlayed = null;
@@ -611,25 +625,21 @@ const BalatroEngine = (() => {
   function skipBlind(state) {
     state.blindsSkipped++;
 
-    // Award a random tag
-    const tagPool = D.tags.filter(t => {
-      if (state.ante <= 1 && ['top_up_tag', 'handy_tag', 'garbage_tag', 'negative_tag',
-          'standard_tag', 'meteor_tag', 'buffoon_tag', 'ethereal_tag', 'orbital_tag'].includes(t.id)) return false;
-      return true;
-    });
-    const tag = tagPool[Math.floor(Math.random() * tagPool.length)];
+    // Use the pre-rolled tag for this blind (0=small, 1=big)
+    ensureSkipTags(state);
+    const tag = state._skipTags ? state._skipTags[state.blind] : null;
     let awardedTag = null;
     if (tag) {
       awardedTag = tag;
-      // Apply immediate tags (money, jokers, etc.)
       if (tag.apply) tag.apply(state);
-      // Store shop-affecting tags for next shop visit
       if (tag.onShopEnter) state.tags.push({ id: tag.id });
     }
 
     // Advance blind
     state.blind++;
     if (state.blind > 2) { state.blind = 0; state.ante++; state.anteBoss = null; }
+    // Clear pre-rolled tags when moving to a new ante
+    if (state.blind === 0) state._skipTags = null;
     state.phase = 'blindSelect';
 
     return awardedTag;
@@ -832,6 +842,7 @@ const BalatroEngine = (() => {
       state.blind = 0;
       state.ante++;
       state.anteBoss = null; // Re-roll boss for next ante
+      state._skipTags = null; // Re-roll skip tags for next ante
       // Anaglyph deck: Double Tag after boss
       if (state.anaglyphDeck) state.tags.push({ id: 'double_tag' });
     }
@@ -1271,7 +1282,7 @@ const BalatroEngine = (() => {
     // State
     freshState,
     // Game flow
-    startRun, applyDeckAndStart, selectBlind, skipBlind, ensureAnteBoss, playHand, discardCards, endBlind,
+    startRun, applyDeckAndStart, selectBlind, skipBlind, ensureAnteBoss, ensureSkipTags, playHand, discardCards, endBlind,
     // Shop
     generateShop, buyShopItem, buyVoucher, buyPack, sellJoker, sellConsumable,
     useConsumable, rerollShop, nextRound,

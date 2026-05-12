@@ -1404,6 +1404,20 @@ body[data-screen="balatro"] .header-btn {
   display: block;
 }
 
+.blind-skip-tag {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin-top: 4px;
+}
+
+.blind-skip-tag-desc {
+  display: block;
+  font-size: 0.55rem;
+  color: #a8b5a0;
+}
+
 .bal-blind-info-bar {
   display: flex;
   justify-content: center;

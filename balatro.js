@@ -172,8 +172,9 @@ const Balatro = (() => {
     if (!container) return;
     container.innerHTML = '';
 
-    // Ensure boss is pre-rolled so we can show it
+    // Ensure boss and skip tags are pre-rolled so we can show them
     E.ensureAnteBoss(state);
+    E.ensureSkipTags(state);
 
     for (let i = 0; i < 3; i++) {
       const name = D.BLIND_NAMES[i];
@@ -194,10 +195,18 @@ const Balatro = (() => {
           '<span class="blind-boss-effect">' + state.anteBoss.desc + '</span>';
       }
 
+      // Skip tag preview (small=0, big=1)
+      let skipTagHtml = '';
+      if (i < 2 && state._skipTags && state._skipTags[i]) {
+        const skipTag = state._skipTags[i];
+        skipTagHtml = '<span class="blind-skip-tag">' + skipTag.name + '</span>' +
+          '<span class="blind-skip-tag-desc">' + skipTag.desc + '</span>';
+      }
+
       // Reward info
       let rewardHtml = '<span class="blind-reward">Reward: $' + reward + '</span>';
-      if (i < 2 && isCurrent) {
-        rewardHtml += '<span class="blind-skip-info">or skip for a Tag</span>';
+      if (i < 2) {
+        rewardHtml += skipTagHtml;
       }
 
       el.innerHTML =
