@@ -73,6 +73,15 @@ document.querySelectorAll('.game-card').forEach(card => {
   });
 });
 
+// Display version from service worker cache name
+if ('caches' in window) {
+  caches.keys().then(names => {
+    const current = names.find(n => n.startsWith('word-games-'));
+    const label = document.getElementById('version-label');
+    if (label && current) label.textContent = current.replace('word-games-', 'v');
+  });
+}
+
 backBtn.addEventListener('click', () => {
   // If inside a game puzzle, go back to the puzzle picker first
   if (screens.wordle.classList.contains('active') && Wordle.isInGame()) {
