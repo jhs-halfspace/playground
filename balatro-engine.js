@@ -276,26 +276,32 @@ const BalatroEngine = (() => {
   // SCORING PIPELINE
   // ============================================================
 
-  // Preview scoring without side effects — uses shallow clones of cards
-  // and joker vars so mutations from hooks don't persist.
+  // Preview scoring without side effects — snapshots all mutable state,
+  // runs the full scoring pipeline, then restores everything.
   function previewScore(state, playedCards) {
     // Clone cards so chipBonus mutations (Hiker) don't persist
     const clonedCards = playedCards.map(c => Object.assign({}, c));
     const clonedHand = state.hand.map(c =>
       playedCards.includes(c) ? clonedCards[playedCards.indexOf(c)] : Object.assign({}, c)
     );
-    // Clone joker vars so stateful joker mutations don't persist
+
+    // Snapshot ALL mutable state that joker hooks might touch
     const savedVars = state.jokers.map(j => j.vars ? JSON.parse(JSON.stringify(j.vars)) : {});
-
-    // Temporarily swap hand for scoring context (heldCards derived from state.hand)
+    const savedMoney = state.money;
+    const savedConsumablesLen = state.consumables.length;
     const origHand = state.hand;
-    state.hand = clonedHand;
 
+    state.hand = clonedHand;
     const result = scoreHand(state, clonedCards);
 
-    // Restore originals
+    // Restore everything
     state.hand = origHand;
     state.jokers.forEach((j, i) => { j.vars = savedVars[i]; });
+    state.money = savedMoney;
+    // Trim any consumables created by hooks (8 Ball, Superposition, etc.)
+    if (state.consumables.length > savedConsumablesLen) {
+      state.consumables.length = savedConsumablesLen;
+    }
 
     return result;
   }
@@ -1295,6 +1301,58 @@ const BalatroEngine = (() => {
   }
 
   // ============================================================
+  // DYNAMIC JOKER DESCRIPTIONS
+  // ============================================================
+
+  // Returns a string showing the joker's current accumulated values
+  // (for stateful jokers that change over the run).
+  function getJokerDynamicDesc(jokerInst) {
+    const v = jokerInst.vars;
+    if (!v) return '';
+    const id = jokerInst.defId;
+    // Accumulated chips
+    if (id === 'runner' && v.extraChips) return '(+' + v.extraChips + ' Chips)';
+    if (id === 'ice_cream') return '(' + (v.chips != null ? v.chips : 100) + ' Chips left)';
+    if (id === 'square_joker' && v.chips) return '(+' + v.chips + ' Chips)';
+    if (id === 'castle' && v.chips) return '(+' + v.chips + ' Chips)';
+    if (id === 'wee_joker' && v.chips) return '(+' + v.chips + ' Chips)';
+    // Accumulated mult
+    if (id === 'green_joker') return '(+' + (v.mult || 0) + ' Mult)';
+    if (id === 'flash_card' && v.mult) return '(+' + v.mult + ' Mult)';
+    if (id === 'spare_trousers' && v.mult) return '(+' + v.mult + ' Mult)';
+    if (id === 'popcorn') return '(+' + (v.mult != null ? v.mult : 20) + ' Mult)';
+    if (id === 'ride_the_bus') return '(+' + (v.streak || 0) + ' Mult)';
+    if (id === 'ceremonial_dagger' && v.bonusMult) return '(+' + v.bonusMult + ' Mult)';
+    if (id === 'supernova') return ''; // dynamic per hand type
+    // Accumulated xMult
+    if (id === 'constellation' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'madness' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'obelisk' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'vampire' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'hologram' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'lucky_cat' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'ramen') return '(\u00d7' + (v.xMult != null ? v.xMult.toFixed(2) : '2.00') + ')';
+    if (id === 'campfire' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(2) + ')';
+    if (id === 'hit_the_road' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(1) + ')';
+    if (id === 'glass_joker' && v.xMult > 1) return '(\u00d7' + v.xMult.toFixed(2) + ')';
+    if (id === 'throwback') return ''; // computed from state.blindsSkipped
+    if (id === 'canio' && v.xMult > 1) return '(\u00d7' + v.xMult + ')';
+    if (id === 'yorick' && v.xMult > 1) return '(\u00d7' + v.xMult + ', ' + v.discardCount + '/23)';
+    // Counter-based
+    if (id === 'loyalty_card') return '(' + ((v.counter || 0) === 0 ? 'ACTIVE!' : (v.counter || 0) + '/6') + ')';
+    if (id === 'seltzer') return '(' + (v.handsLeft || 0) + ' hands left)';
+    if (id === 'invisible_joker') return '(' + (v.rounds || 0) + '/2 rounds)';
+    // Economy
+    if (id === 'egg') return '(+$' + (v.extraSellValue || 0) + ' sell value)';
+    if (id === 'rocket') return '($' + (v.payout || 1) + '/round)';
+    if (id === 'to_do_list' && v.target) return '(Target: ' + v.target + ')';
+    if (id === 'mail_in_rebate' && v.targetRank) return '(Target: ' + v.targetRank + ')';
+    if (id === 'the_idol' && v.targetRank) return '(' + v.targetRank + ' of ' + D.SUIT_SYMBOLS[v.targetSuit] + ')';
+    if (id === 'ancient_joker' && v.targetSuit) return '(' + D.SUIT_SYMBOLS[v.targetSuit] + ')';
+    return '';
+  }
+
+  // ============================================================
   // PUBLIC API
   // ============================================================
 
@@ -1315,6 +1373,6 @@ const BalatroEngine = (() => {
     // Pack
     pickFromPack, skipPack,
     // Helpers
-    shuffle, sortHand, isFaceCard,
+    shuffle, sortHand, isFaceCard, getJokerDynamicDesc,
   };
 })();

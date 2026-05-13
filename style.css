@@ -1745,6 +1745,64 @@ body[data-screen="balatro"] .header-btn {
   transform: translateY(-4px);
 }
 
+/* ---- Card enhancement/edition labels ---- */
+
+.card-enh-label {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 0;
+  line-height: 1.1;
+  border-radius: 0 0 4px 4px;
+}
+
+.card-enh-label.enh-bonus { background: #2563eb; color: #fff; }
+.card-enh-label.enh-mult { background: #dc3545; color: #fff; }
+.card-enh-label.enh-wild { background: linear-gradient(90deg, #dc3545, #2563eb, #28a745); color: #fff; }
+.card-enh-label.enh-glass { background: rgba(100, 150, 255, 0.6); color: #fff; }
+.card-enh-label.enh-steel { background: #8a9bb0; color: #fff; }
+.card-enh-label.enh-stone { background: #6b6b6b; color: #fff; }
+.card-enh-label.enh-gold { background: #daa520; color: #1a1a1b; }
+.card-enh-label.enh-lucky { background: #28a745; color: #fff; }
+
+.card-ed-label {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.35rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #daa520;
+}
+
+/* ---- Consumable use message ---- */
+
+.cons-msg-type {
+  font-size: 0.7rem;
+  color: #a8b5a0;
+  text-transform: uppercase;
+}
+
+.cons-msg-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.cons-msg-desc {
+  font-size: 0.8rem;
+  color: #e8e6d9;
+  margin-top: 2px;
+}
+
 /* ---- Card modifier indicators ---- */
 
 .bal-card.debuffed { opacity: 0.4; filter: grayscale(0.8); }
@@ -1783,6 +1841,12 @@ body[data-screen="balatro"] .header-btn {
 .bal-joker-card.ed-holographic { box-shadow: 0 0 8px rgba(255, 100, 255, 0.3); }
 .bal-joker-card.ed-polychrome { box-shadow: 0 0 10px rgba(255, 150, 50, 0.3); }
 .bal-joker-card.debuffed { opacity: 0.35; filter: grayscale(0.6); }
+
+.joker-dynamic {
+  font-size: 0.6rem;
+  color: #ffd700;
+  font-weight: 700;
+}
 
 .joker-edition {
   font-size: 0.55rem;

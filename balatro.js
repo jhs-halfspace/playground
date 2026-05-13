@@ -440,6 +440,18 @@ const Balatro = (() => {
     const rankDisplay = card.enhancement === 'stone' ? '' : card.rank;
     const suitSymbol = card.enhancement === 'stone' ? '\u2588' : D.SUIT_SYMBOLS[card.suit];
 
+    // Enhancement label
+    let enhLabel = '';
+    if (card.enhancement && D.ENHANCEMENTS[card.enhancement]) {
+      enhLabel = '<span class="card-enh-label enh-' + card.enhancement + '">' +
+        D.ENHANCEMENTS[card.enhancement].name + '</span>';
+    }
+    // Edition indicator
+    let edLabel = '';
+    if (card.edition && card.edition !== 'base' && D.EDITIONS[card.edition]) {
+      edLabel = '<span class="card-ed-label">' + D.EDITIONS[card.edition].name + '</span>';
+    }
+
     el.innerHTML =
       '<span class="card-tl">' +
         '<span class="card-rank">' + rankDisplay + '</span>' +
@@ -450,6 +462,7 @@ const Balatro = (() => {
         '<span class="card-rank">' + rankDisplay + '</span>' +
         '<span class="card-suit-sm">' + suitSymbol + '</span>' +
       '</span>' +
+      enhLabel + edLabel +
       (card.seal ? '<span class="card-seal seal-dot-' + card.seal + '"></span>' : '');
 
     return el;
@@ -554,6 +567,7 @@ const Balatro = (() => {
           if (indices.length >= (def.minCards || 1) && indices.length <= (def.maxCards || 5)) {
             E.useConsumable(state, idx, indices);
             state.selected = new Set();
+            showConsumableMessage(def, cons.type);
             renderGame();
           } else {
             dom.message.textContent = selectionHint + ' first, then click ' + (def ? def.name : 'consumable');
@@ -561,6 +575,7 @@ const Balatro = (() => {
           }
         } else {
           if (E.useConsumable(state, idx, [])) {
+            showConsumableMessage(def, cons.type);
             renderGame();
           }
         }
@@ -595,12 +610,14 @@ const Balatro = (() => {
       el.className = 'bal-joker-card ' + def.rarity + (sellable ? ' sellable' : '') +
         (ji._debuffed ? ' debuffed' : '') +
         (ji.edition && ji.edition !== 'base' ? ' ed-' + ji.edition : '');
+      const dynDesc = E.getJokerDynamicDesc(ji);
       el.innerHTML =
         '<span class="joker-name">' + def.name + '</span>' +
         '<span class="joker-desc">' + def.desc + '</span>' +
+        (dynDesc ? '<span class="joker-dynamic">' + dynDesc + '</span>' : '') +
         (ji.edition && ji.edition !== 'base' ? '<span class="joker-edition">' + D.EDITIONS[ji.edition].name + '</span>' : '') +
         (sellable ? '<span class="joker-sell">Sell $' + (ji.sellValue || 1) + '</span>' : '');
-      el.title = def.desc;
+      el.title = def.desc + (dynDesc ? ' ' + dynDesc : '');
 
       if (sellable) {
         el.addEventListener('click', () => {
@@ -903,6 +920,18 @@ const Balatro = (() => {
       }
       render();
     }, 1400);
+  }
+
+  function showConsumableMessage(def, type) {
+    if (!dom.message || !def) return;
+    const typeLabel = type === 'planet' ? 'Planet' : type === 'tarot' ? 'Tarot' : 'Spectral';
+    dom.message.innerHTML =
+      '<div class="bal-score-anim">' +
+        '<span class="cons-msg-type">' + typeLabel + '</span> ' +
+        '<span class="cons-msg-name">' + def.name + '</span>' +
+        '<div class="cons-msg-desc">' + def.desc + '</div>' +
+      '</div>';
+    setTimeout(() => { dom.message.textContent = ''; }, 2000);
   }
 
   function doSkipBlind() {
