@@ -106,6 +106,13 @@ header h1 {
   font-size: 0.95rem;
 }
 
+.version-label {
+  color: #b0b3b8;
+  font-size: 0.75rem;
+  text-align: center;
+  margin-top: 8px;
+}
+
 /* ============================================================
    WORDLE
    ============================================================ */
