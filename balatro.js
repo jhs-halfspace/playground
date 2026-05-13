@@ -429,6 +429,14 @@ const Balatro = (() => {
 
   function createCardElement(card, selected) {
     const el = document.createElement('div');
+    const isFaceDown = card._faceDown;
+
+    if (isFaceDown) {
+      el.className = 'bal-card face-down' + (selected ? ' selected' : '');
+      el.innerHTML = '<span class="card-center">?</span>';
+      return el;
+    }
+
     const suitClass = card.enhancement === 'stone' ? 'stone' : card.suit;
     el.className = 'bal-card ' + suitClass +
       (selected ? ' selected' : '') +
@@ -655,6 +663,10 @@ const Balatro = (() => {
     dom.shopInfo.innerHTML = earningsHtml +
       '<div class="bal-shop-meta">' +
         '<span class="bal-money">$' + state.money + '</span>' +
+        '<span>Jokers: ' + state.jokers.length + '/' + state.maxJokers + '</span>' +
+        '<span>Items: ' + state.consumables.length + '/' + state.maxConsumables + '</span>' +
+      '</div>' +
+      '<div class="bal-shop-meta" style="margin-top:4px">' +
         '<span class="bal-next-blind">Next: Ante ' + state.ante + ' \u2013 ' + D.BLIND_NAMES[state.blind] + '</span>' +
       '</div>';
 
@@ -693,7 +705,7 @@ const Balatro = (() => {
 
         if (canBuy) {
           el.addEventListener('click', () => {
-            E.buyShopItem(state, idx);
+            if (!E.buyShopItem(state, idx)) return; // Slot full or can't afford
             renderShop();
           });
         }
@@ -882,6 +894,8 @@ const Balatro = (() => {
 
   function toggleCard(index) {
     if (state.phase !== 'playing') return;
+    // Cerulean Bell: can't deselect the forced card
+    if (state._ceruleanActive && index === state._forcedCardIdx && state.selected.has(index)) return;
     if (state.selected.has(index)) {
       state.selected.delete(index);
     } else if (state.selected.size < D.GAME.MAX_PLAY) {

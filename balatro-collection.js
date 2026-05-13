@@ -44,8 +44,14 @@
 
     { id: 'the_house', name: 'The House',
       desc: 'All cards drawn face down on first hand',
-      onBlindStart(state) { state._houseActive = true; },
-      onHandPlayed(state) { state._houseActive = false; } },
+      onBlindStart(state) {
+        state._houseActive = true;
+        state.hand.forEach(c => { c._faceDown = true; });
+      },
+      onHandPlayed(state) {
+        state._houseActive = false;
+        state.hand.forEach(c => { c._faceDown = false; });
+      } },
 
     { id: 'the_wall', name: 'The Wall',
       desc: 'Extra large blind (4\u00d7 base)',
@@ -54,7 +60,9 @@
 
     { id: 'the_wheel', name: 'The Wheel',
       desc: '1 in 7 cards drawn face down',
-      onCardDraw(state, card) { if (Math.random() < 1/7) card._faceDown = true; } },
+      onNewCards(state) {
+        state.hand.forEach(c => { if (Math.random() < 1/7) c._faceDown = true; });
+      } },
 
     { id: 'the_arm', name: 'The Arm',
       desc: 'Decreases level of played hand by 1',
@@ -70,7 +78,14 @@
 
     { id: 'the_fish', name: 'The Fish',
       desc: 'Cards drawn after playing are face down',
-      onHandPlayed(state) { state._fishActive = true; } },
+      onNewCards(state) {
+        // After the first hand, newly drawn cards are face down
+        if (state._fishHandCount > 0) {
+          state.hand.forEach(c => { if (!c._wasInHand) c._faceDown = true; });
+        }
+      },
+      onBlindStart(state) { state._fishHandCount = 0; },
+      onHandPlayed(state) { state._fishHandCount++; } },
 
     { id: 'the_psychic', name: 'The Psychic',
       desc: 'Must play exactly 5 cards',
@@ -94,7 +109,8 @@
 
     { id: 'the_serpent', name: 'The Serpent',
       desc: 'Always draw 3 cards after play or discard',
-      drawOverride: 3 },
+      drawOverride: 3,
+      onBlindStart(state) { state._serpentDraw = 3; } },
 
     { id: 'the_pillar', name: 'The Pillar',
       desc: 'Cards played previously this round are debuffed',
@@ -128,7 +144,12 @@
 
     { id: 'the_mark', name: 'The Mark',
       desc: 'All face cards are drawn face down',
-      onBlindStart(state) { state._markActive = true; } },
+      onBlindStart(state) { state._markActive = true; },
+      onNewCards(state) {
+        if (state._markActive) {
+          state.hand.forEach(c => { if (D.FACE_RANKS.includes(c.rank)) c._faceDown = true; });
+        }
+      } },
 
     { id: 'the_eye', name: 'The Eye',
       desc: 'No repeat hand types this round',
@@ -166,8 +187,14 @@
 
     { id: 'crimson_heart', name: 'Crimson Heart',
       desc: 'One random Joker debuffed each hand',
+      onBlindStart(state) {
+        // Debuff a random joker at the start of the round
+        if (state.jokers.length > 0) {
+          state.jokers[Math.floor(Math.random() * state.jokers.length)]._debuffed = true;
+        }
+      },
       onHandPlayed(state) {
-        // Clear previous debuff
+        // Re-roll debuff each hand
         state.jokers.forEach(j => { j._debuffed = false; });
         if (state.jokers.length > 0) {
           state.jokers[Math.floor(Math.random() * state.jokers.length)]._debuffed = true;
@@ -177,8 +204,13 @@
     { id: 'cerulean_bell', name: 'Cerulean Bell',
       desc: 'One card is always forced selected',
       onBlindStart(state) {
-        if (state.hand.length > 0) {
-          state._forcedCardId = state.hand[Math.floor(Math.random() * state.hand.length)].id;
+        state._ceruleanActive = true;
+      },
+      onNewCards(state) {
+        // Pick a random card to force-select whenever hand changes
+        if (state._ceruleanActive && state.hand.length > 0) {
+          state._forcedCardIdx = Math.floor(Math.random() * state.hand.length);
+          state.selected = new Set([state._forcedCardIdx]);
         }
       } },
 

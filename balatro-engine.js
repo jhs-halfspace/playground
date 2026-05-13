@@ -250,6 +250,9 @@ const BalatroEngine = (() => {
   // JOKER RESOLUTION (Blueprint / Brainstorm)
   // ============================================================
 
+  // Returns { def, vars } for a joker instance, resolving Blueprint/Brainstorm copies.
+  // Blueprint copies the joker to its right; Brainstorm copies the leftmost joker.
+  // Returns the TARGET joker's def AND vars so stateful effects work correctly.
   function resolveJokerDef(state, jokerInst, idx) {
     const def = D.findJoker(jokerInst.defId);
     if (!def) return null;
@@ -258,17 +261,21 @@ const BalatroEngine = (() => {
     if (def.isCopy === 'right') {
       const rightInst = state.jokers[idx + 1];
       if (rightInst && rightInst.defId !== 'blueprint' && rightInst.defId !== 'brainstorm') {
-        return D.findJoker(rightInst.defId);
+        const targetDef = D.findJoker(rightInst.defId);
+        // Use target joker's vars, not Blueprint's empty vars
+        if (targetDef) { jokerInst._resolvedVars = rightInst.vars; return targetDef; }
       }
       return null;
     }
     if (def.isCopy === 'left') {
       const leftInst = state.jokers[0];
       if (leftInst && leftInst !== jokerInst && leftInst.defId !== 'blueprint' && leftInst.defId !== 'brainstorm') {
-        return D.findJoker(leftInst.defId);
+        const targetDef = D.findJoker(leftInst.defId);
+        if (targetDef) { jokerInst._resolvedVars = leftInst.vars; return targetDef; }
       }
       return null;
     }
+    jokerInst._resolvedVars = null; // not a copy, use own vars
     return def;
   }
 
@@ -361,7 +368,7 @@ const BalatroEngine = (() => {
         state.jokers.forEach((ji, idx) => {
           const def = resolveJokerDef(state, ji, idx);
           if (def && def.onCardScore) {
-            def.onCardScore(ctx, card, ji.vars);
+            def.onCardScore(ctx, card, ji._resolvedVars || ji.vars);
           }
         });
       }
@@ -383,7 +390,7 @@ const BalatroEngine = (() => {
         state.jokers.forEach((ji, idx) => {
           const def = resolveJokerDef(state, ji, idx);
           if (def && def.onHeldCard) {
-            def.onHeldCard(ctx, card, ji.vars);
+            def.onHeldCard(ctx, card, ji._resolvedVars || ji.vars);
           }
         });
       }
@@ -393,7 +400,7 @@ const BalatroEngine = (() => {
     state.jokers.forEach((ji, idx) => {
       const def = resolveJokerDef(state, ji, idx);
       if (def && def.onScore) {
-        def.onScore(ctx, ji.vars);
+        def.onScore(ctx, ji._resolvedVars || ji.vars);
       }
 
       // Joker's own edition
@@ -645,8 +652,9 @@ const BalatroEngine = (() => {
     const handSize = state.handSize + state.permHandSizeBonus + tempHandSizeBonus + bossTempSize;
     state.hand = state.drawPile.splice(0, Math.max(1, handSize));
 
-    // Apply boss debuffs to hand
+    // Apply boss debuffs and face-down effects to hand
     applyBossDebuffs(state);
+    applyBossNewCards(state);
 
     state.selected = new Set();
     state.phase = 'playing';
@@ -683,6 +691,13 @@ const BalatroEngine = (() => {
     if (boss && boss.debuffCards) boss.debuffCards(state);
   }
 
+  // Called after dealing or drawing new cards — handles face-down effects
+  // and forced selection (Cerulean Bell).
+  function applyBossNewCards(state) {
+    const boss = state.bossEffect ? D.findBoss(state.bossEffect) : null;
+    if (boss && boss.onNewCards) boss.onNewCards(state);
+  }
+
   function playHand(state) {
     if (state.selected.size === 0 || state.hands <= 0 || state.phase !== 'playing') return null;
 
@@ -699,14 +714,12 @@ const BalatroEngine = (() => {
     // Evaluate hand type
     const handType = evaluateHand(playedCards, state);
 
-    // Boss: The Eye (no repeat hand types)
+    // Boss hand validation (The Eye: no repeats, The Mouth: one type only)
     if (boss && boss.validateHand && !boss.validateHand(state, handType)) {
-      return { error: 'Cannot play ' + handType + ' again this round!' };
-    }
-
-    // Boss: The Mouth (only one hand type)
-    if (boss && boss.id === 'the_mouth' && boss.validateHand && !boss.validateHand(state, handType)) {
-      return { error: 'Must play ' + (state._mouthType || '') + ' this round!' };
+      if (boss.id === 'the_mouth' && state._mouthType) {
+        return { error: 'Must play ' + state._mouthType + ' this round!' };
+      }
+      return { error: 'Cannot play ' + handType + ' this round!' };
     }
 
     // Score the hand
@@ -731,8 +744,11 @@ const BalatroEngine = (() => {
     // This must happen before boss/joker onHandPlayed hooks which may
     // further modify the hand (e.g., The Hook discards 2 more cards).
     const remaining = state.hand.filter((_, i) => !state.selected.has(i));
-    const drawCount = Math.min(indices.length, state.drawPile.length);
-    const drawn = state.drawPile.splice(0, drawCount);
+    // The Serpent overrides draw count to always 3
+    const serpentDraw = state._serpentDraw;
+    const normalDraw = indices.length;
+    const actualDraw = serpentDraw ? Math.min(serpentDraw, state.drawPile.length) : Math.min(normalDraw, state.drawPile.length);
+    const drawn = state.drawPile.splice(0, actualDraw);
     state.hand = [...remaining, ...drawn];
     state.selected = new Set();
 
@@ -757,8 +773,9 @@ const BalatroEngine = (() => {
       }
     });
 
-    // Re-apply boss debuffs to new hand
+    // Re-apply boss debuffs and face-down effects to new hand
     applyBossDebuffs(state);
+    applyBossNewCards(state);
 
     // Sort hand
     sortHand(state);
@@ -790,12 +807,14 @@ const BalatroEngine = (() => {
 
     // Remove from hand and draw replacements
     const remaining = state.hand.filter((_, i) => !state.selected.has(i));
-    const drawCount = Math.min(indices.length, state.drawPile.length);
+    const serpentDraw2 = state._serpentDraw;
+    const drawCount = serpentDraw2 ? Math.min(serpentDraw2, state.drawPile.length) : Math.min(indices.length, state.drawPile.length);
     const drawn = state.drawPile.splice(0, drawCount);
     state.hand = [...remaining, ...drawn];
     state.selected = new Set();
 
     applyBossDebuffs(state);
+    applyBossNewCards(state);
     sortHand(state);
   }
 
@@ -823,7 +842,12 @@ const BalatroEngine = (() => {
     const noSmallReward = stakeDef && stakeDef.modifiers.includes('no_small_reward') && state.blind === 0;
     const base = noSmallReward ? 0 : blindReward;
     const handBonus = state.hands;
-    const interest = Math.min(state.interestCap, Math.floor(Math.max(0, state.money) / D.GAME.INTEREST_RATE));
+    // To the Moon raises interest cap by $1 per $5 held
+    let effectiveInterestCap = state.interestCap;
+    if (state.jokers.some(j => j.defId === 'to_the_moon')) {
+      effectiveInterestCap += Math.floor(Math.max(0, state.money) / 5);
+    }
+    const interest = Math.min(effectiveInterestCap, Math.floor(Math.max(0, state.money) / D.GAME.INTEREST_RATE));
 
     // Green deck special earnings
     let greenBonus = 0;
@@ -942,6 +966,12 @@ const BalatroEngine = (() => {
       state._couponActive = false;
     }
 
+    // Astronomer: all planet cards and celestial packs are free
+    if (state.jokers.some(j => j.defId === 'astronomer')) {
+      state.shopSlots.forEach(s => { if (s && s.type === 'planet') s.cost = 0; });
+      state.packSlots.forEach(p => { if (p && p.type === 'celestial') p.cost = 0; });
+    }
+
     // Generate booster pack slots (2)
     state.packSlots = [];
     for (let i = 0; i < 2; i++) {
@@ -1031,7 +1061,9 @@ const BalatroEngine = (() => {
     if (!item || item.sold) return false;
 
     const cost = item.cost || 0;
-    if (state.money < cost) return false;
+    // Credit Card allows going up to -$20 in debt
+    const debtLimit = state.jokers.some(j => j.defId === 'credit_card') ? 20 : 0;
+    if (state.money + debtLimit < cost) return false;
 
     if (item.type === 'joker') {
       if (state.jokers.length >= state.maxJokers) {
@@ -1196,7 +1228,12 @@ const BalatroEngine = (() => {
     // Fire onSell hook
     if (def && def.onSell) def.onSell(state, ji.vars);
 
-    // Campfire joker bonus
+    // Reverse permanent effects when selling
+    if (ji.defId === 'juggler') state.permHandSizeBonus--;
+    if (ji.defId === 'stuntman') state.permHandSizeBonus += 2;
+    if (ji.defId === 'oops_all_6s') state.luckMult = 1;
+
+    // Campfire joker bonus (selling any card gives +x0.25)
     state.jokers.forEach(j => {
       if (j.defId === 'campfire' && j.vars) j.vars.xMult = (j.vars.xMult || 1) + 0.25;
     });
@@ -1205,9 +1242,6 @@ const BalatroEngine = (() => {
     if (state._verdantActive) state._verdantActive = false;
 
     state.jokers.splice(index, 1);
-
-    // Update Oops All 6s
-    if (ji.defId === 'oops_all_6s') state.luckMult = 1;
   }
 
   function sellConsumable(state, index) {
@@ -1237,6 +1271,11 @@ const BalatroEngine = (() => {
 
     const selectedCards = selectedCardIndices ? selectedCardIndices.map(i => state.hand[i]) : [];
 
+    // Remove consumable BEFORE applying effect — fixes slot-limit bug where
+    // The Fool / High Priestess / Emperor try to create consumables but find
+    // no room because themselves still occupy a slot.
+    state.consumables.splice(index, 1);
+
     // Apply effect
     def.apply(state, selectedCards);
 
@@ -1248,10 +1287,12 @@ const BalatroEngine = (() => {
     } else if (cons.type === 'planet') {
       state.lastConsumedId = cons.id;
       state.lastConsumedType = 'planet';
+    } else if (cons.type === 'spectral') {
+      state.lastConsumedId = cons.id;
+      state.lastConsumedType = 'spectral';
     }
 
-    // Remove consumable
-    state.consumables.splice(index, 1);
+    // Consumable already removed above (before apply)
     return true;
   }
 

@@ -1837,6 +1837,12 @@ body[data-screen="balatro"] .header-btn {
 
 /* ---- Card modifier indicators ---- */
 
+.bal-card.face-down {
+  background: linear-gradient(135deg, #1a3a6e 0%, #162d54 100%);
+  border-color: #8b7355;
+  color: #8b7355;
+}
+
 .bal-card.debuffed { opacity: 0.4; filter: grayscale(0.8); }
 
 .bal-card.enh-bonus { box-shadow: 0 0 6px rgba(37, 99, 235, 0.5) inset; }

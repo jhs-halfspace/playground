@@ -258,6 +258,7 @@
           const enh = enhancements[Math.floor(Math.random() * enhancements.length)];
           const card = { id: 'fam_' + Date.now() + '_' + i, suit, rank, enhancement: enh, edition: 'base', seal: null, chipBonus: 0, debuffed: false };
           state.deck.push(card);
+          state.hand.push(card);
         }
       } },
 
@@ -276,6 +277,7 @@
           const enh = enhancements[Math.floor(Math.random() * enhancements.length)];
           const card = { id: 'grim_' + Date.now() + '_' + i, suit, rank: 'A', enhancement: enh, edition: 'base', seal: null, chipBonus: 0, debuffed: false };
           state.deck.push(card);
+          state.hand.push(card);
         }
       } },
 
@@ -296,6 +298,7 @@
           const enh = enhancements[Math.floor(Math.random() * enhancements.length)];
           const card = { id: 'inc_' + Date.now() + '_' + i, suit, rank, enhancement: enh, edition: 'base', seal: null, chipBonus: 0, debuffed: false };
           state.deck.push(card);
+          state.hand.push(card);
         }
       } },
 
@@ -337,6 +340,7 @@
     { id: 'ouija', name: 'Ouija',
       desc: 'Converts ALL cards in hand to a single random rank, -1 Hand Size',
       needsSelection: false,
+      canUse(state) { return state.hand.length > 0; },
       apply(state) {
         const rank = D.RANKS[Math.floor(Math.random() * D.RANKS.length)];
         state.hand.forEach(c => { c.rank = rank; });
@@ -358,6 +362,7 @@
     { id: 'immolate', name: 'Immolate',
       desc: 'Destroys 5 random cards in hand, gain $20',
       needsSelection: false,
+      canUse(state) { return state.hand.length > 0; },
       apply(state) {
         const toDestroy = Math.min(5, state.hand.length);
         for (let i = 0; i < toDestroy; i++) {

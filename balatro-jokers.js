@@ -120,8 +120,9 @@
     { id: 'mime', name: 'Mime', desc: 'Retrigger all held-in-hand effects', cost: 5, rarity: 'common',
       retriggerHeld: true },
 
-    { id: 'credit_card', name: 'Credit Card', desc: 'Go up to -$20 in debt', cost: 1, rarity: 'common' },
-    // Effect handled in money system
+    { id: 'credit_card', name: 'Credit Card', desc: 'Go up to -$20 in debt', cost: 1, rarity: 'common',
+      debtLimit: 20 },
+    // Engine checks for credit_card debtLimit in buyShopItem
 
     { id: 'ceremonial_dagger', name: 'Ceremonial Dagger', desc: 'When Blind selected, destroy right Joker, add 2\u00d7 its sell value as Mult', cost: 6, rarity: 'common',
       initVars() { return { bonusMult: 0 }; },
@@ -201,8 +202,10 @@
       onScore(ctx) { ctx.mult += 3 * ctx.state.jokers.length; } },
 
     { id: 'delayed_gratification', name: 'Delayed Gratification', desc: '$2 per discard if none used', cost: 4, rarity: 'uncommon',
-      onRoundEnd(state) {
-        if (state.discards === (D.GAME.MAX_DISCARDS + (state.bonusDiscards || 0))) {
+      initVars() { return { startingDiscards: 0 }; },
+      onBlindSelect(state, vars) { vars.startingDiscards = state.discards; },
+      onRoundEnd(state, vars) {
+        if (state.discards === vars.startingDiscards) {
           state.money += 2 * state.discards;
         }
       } },
@@ -258,14 +261,20 @@
 
     { id: 'egg', name: 'Egg', desc: 'Gains $3 sell value at end of round', cost: 4, rarity: 'uncommon',
       initVars() { return { extraSellValue: 0 }; },
-      onRoundEnd(state, vars) { vars.extraSellValue += 3; } },
+      onRoundEnd(state, vars) {
+        vars.extraSellValue += 3;
+        // Apply to actual sellValue on the joker instance
+        const inst = state.jokers.find(j => j.defId === 'egg');
+        if (inst) inst.sellValue = (inst.sellValue || 2) + 3;
+      } },
 
     { id: 'burglar', name: 'Burglar', desc: 'When Blind selected, +3 Hands, lose all discards', cost: 6, rarity: 'uncommon',
       onBlindSelect(state) { state.hands += 3; state.discards = 0; } },
 
     { id: 'blackboard', name: 'Blackboard', desc: '\u00d73 Mult if all held cards are \u2660 or \u2663', cost: 6, rarity: 'uncommon',
       onScore(ctx) {
-        if (ctx.heldCards.length > 0 && ctx.heldCards.every(c => c.suit === 'spades' || c.suit === 'clubs' || c.enhancement === 'wild')) {
+        // Vacuous truth: 0 held cards = all held cards satisfy condition
+        if (ctx.heldCards.every(c => c.suit === 'spades' || c.suit === 'clubs' || c.enhancement === 'wild')) {
           ctx.mult *= 3;
         }
       } },
@@ -288,8 +297,20 @@
         }
       } },
 
-    { id: 'dna', name: 'DNA', desc: 'First hand of round: if 1 card, copy it to deck and draw', cost: 8, rarity: 'uncommon' },
-    // Complex effect - handled in engine
+    { id: 'dna', name: 'DNA', desc: 'First hand of round: if 1 card, copy it to deck and draw', cost: 8, rarity: 'uncommon',
+      initVars() { return { firstHand: true }; },
+      onBlindSelect(state, vars) { vars.firstHand = true; },
+      onHandPlayed(state, vars, handType, scoringCards) {
+        if (vars.firstHand && scoringCards && scoringCards.length === 1) {
+          const src = scoringCards[0];
+          const copy = { id: 'dna_' + Date.now(), suit: src.suit, rank: src.rank,
+            enhancement: src.enhancement, edition: src.edition, seal: src.seal,
+            chipBonus: src.chipBonus || 0, debuffed: false };
+          state.deck.push(copy);
+          state.hand.push(copy);
+        }
+        vars.firstHand = false;
+      } },
 
     { id: 'splash', name: 'Splash', desc: 'Every played card counts in scoring', cost: 3, rarity: 'uncommon' },
     // Effect handled in scoring pipeline
@@ -297,8 +318,22 @@
     { id: 'blue_joker', name: 'Blue Joker', desc: '+2 Chips per remaining card in deck', cost: 5, rarity: 'uncommon',
       onScore(ctx) { ctx.chips += 2 * ctx.state.drawPile.length; } },
 
-    { id: 'sixth_sense', name: 'Sixth Sense', desc: 'First hand: if single 6, destroy it and create Spectral', cost: 6, rarity: 'uncommon' },
-    // Complex effect - handled in engine
+    { id: 'sixth_sense', name: 'Sixth Sense', desc: 'First hand: if single 6, destroy it and create Spectral', cost: 6, rarity: 'uncommon',
+      initVars() { return { firstHand: true }; },
+      onBlindSelect(state, vars) { vars.firstHand = true; },
+      onHandPlayed(state, vars, handType, scoringCards) {
+        if (vars.firstHand && scoringCards && scoringCards.length === 1 && scoringCards[0].rank === '6') {
+          const card = scoringCards[0];
+          const deckIdx = state.deck.findIndex(c => c.id === card.id);
+          if (deckIdx >= 0) state.deck.splice(deckIdx, 1);
+          if (state.consumables.length < state.maxConsumables) {
+            const D = BalatroData;
+            const s = D.spectrals[Math.floor(Math.random() * D.spectrals.length)];
+            if (s) state.consumables.push({ type: 'spectral', id: s.id });
+          }
+        }
+        vars.firstHand = false;
+      } },
 
     { id: 'constellation', name: 'Constellation', desc: 'Gains \u00d70.1 Mult per Planet used', cost: 6, rarity: 'uncommon',
       initVars() { return { xMult: 1 }; },
@@ -485,8 +520,8 @@
       },
       onRoundEnd(state, vars) { vars.targetRank = D.RANKS[Math.floor(Math.random() * 13)]; } },
 
-    { id: 'to_the_moon', name: 'To the Moon', desc: '+$1 interest per $5 at end of round', cost: 5, rarity: 'uncommon',
-      onRoundEnd(state) { state.money += Math.floor(state.money / 5); } },
+    { id: 'to_the_moon', name: 'To the Moon', desc: '+$1 interest cap per $5 held', cost: 5, rarity: 'uncommon' },
+    // Effect: raises interest cap by $1 per $5 held. Handled in engine endBlind earnings.
 
     { id: 'hallucination', name: 'Hallucination', desc: '1/2 chance to create Tarot when Booster opened', cost: 4, rarity: 'uncommon',
       onPackOpen(state) {
@@ -616,8 +651,16 @@
     { id: 'troubadour', name: 'Troubadour', desc: '+2 hand size, -1 hand per round', cost: 6, rarity: 'rare' },
     // Effect applied at round start
 
-    { id: 'certificate', name: 'Certificate', desc: 'Add random card with random Seal to hand at round start', cost: 6, rarity: 'rare' },
-    // Effect handled in engine
+    { id: 'certificate', name: 'Certificate', desc: 'Add random card with random Seal to hand at round start', cost: 6, rarity: 'rare',
+      onBlindSelect(state) {
+        const D = BalatroData;
+        const suit = D.SUITS[Math.floor(Math.random() * 4)];
+        const rank = D.RANKS[Math.floor(Math.random() * D.RANKS.length)];
+        const seals = ['gold', 'red', 'blue', 'purple'];
+        const card = { id: 'cert_' + Date.now(), suit, rank, enhancement: null, edition: 'base',
+          seal: seals[Math.floor(Math.random() * 4)], chipBonus: 0, debuffed: false };
+        state.hand.push(card);
+      } },
 
     { id: 'smeared_joker', name: 'Smeared Joker', desc: '\u2665\u2666 count as same suit. \u2660\u2663 count as same suit', cost: 7, rarity: 'rare' },
     // Effect handled in hand evaluation
@@ -696,8 +739,15 @@
         if (hasClub && hasOther) ctx.mult *= 2;
       } },
 
-    { id: 'matador', name: 'Matador', desc: '$8 if hand triggers Boss Blind ability', cost: 7, rarity: 'rare' },
-    // Effect handled in engine boss blind logic
+    { id: 'matador', name: 'Matador', desc: '$8 if hand triggers Boss Blind ability', cost: 7, rarity: 'rare',
+      onScore(ctx) {
+        const boss = ctx.state.bossEffect ? BalatroData.findBoss(ctx.state.bossEffect) : null;
+        if (!boss) return;
+        // Triggers when a boss debuff actively affects the hand
+        if (boss.debuffCards || boss.requireExact || boss.validateHand || boss.halveBase) {
+          ctx.money += 8;
+        }
+      } },
 
     { id: 'hit_the_road', name: 'Hit the Road', desc: 'Gains \u00d70.5 Mult per Jack discarded this round', cost: 8, rarity: 'rare',
       initVars() { return { xMult: 1 }; },
@@ -759,16 +809,22 @@
         }
       } },
 
-    { id: 'astronomer', name: 'Astronomer', desc: 'All Planet cards and Celestial Packs are free', cost: 8, rarity: 'rare' },
-    // Effect handled in shop pricing
+    { id: 'astronomer', name: 'Astronomer', desc: 'All Planet cards and Celestial Packs are free', cost: 8, rarity: 'rare',
+      astronomerActive: true },
+    // Engine checks astronomerActive in shop pricing
 
     { id: 'burnt_joker', name: 'Burnt Joker', desc: 'Upgrade level of first discarded hand type each round', cost: 8, rarity: 'rare',
       initVars() { return { usedThisRound: false }; },
       onDiscard(state, cards, vars) {
         if (!vars.usedThisRound && cards.length > 0) {
           vars.usedThisRound = true;
-          // Evaluate hand type of discarded cards and level it up
-          // This is handled by engine since it needs evaluateHand
+          if (typeof BalatroEngine !== 'undefined') {
+            const ht = BalatroEngine.evaluateHand(cards, state);
+            if (ht) {
+              if (!state.handLevels[ht]) state.handLevels[ht] = { level: 1 };
+              state.handLevels[ht].level++;
+            }
+          }
         }
       },
       onBlindSelect(state, vars) { vars.usedThisRound = false; } },
