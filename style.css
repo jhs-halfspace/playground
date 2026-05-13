@@ -1810,6 +1810,31 @@ body[data-screen="balatro"] .header-btn {
   margin-top: 2px;
 }
 
+.cons-msg-extra {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin-top: 4px;
+}
+
+.tag-reward-money {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin-top: 6px;
+}
+
+.bal-shop-toast {
+  background: rgba(218, 165, 32, 0.15);
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #ffd700;
+  text-align: center;
+}
+
 /* ---- Card modifier indicators ---- */
 
 .bal-card.debuffed { opacity: 0.4; filter: grayscale(0.8); }

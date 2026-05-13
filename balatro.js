@@ -565,17 +565,23 @@ const Balatro = (() => {
           if (state.phase !== 'playing') return;
           const indices = [...state.selected];
           if (indices.length >= (def.minCards || 1) && indices.length <= (def.maxCards || 5)) {
+            const moneyBefore = state.money;
             E.useConsumable(state, idx, indices);
             state.selected = new Set();
-            showConsumableMessage(def, cons.type);
+            const moneyDiff = state.money - moneyBefore;
+            const extra = moneyDiff > 0 ? '+$' + moneyDiff : (moneyDiff < 0 ? '-$' + Math.abs(moneyDiff) : '');
+            showConsumableMessage(def, cons.type, extra);
             renderGame();
           } else {
             dom.message.textContent = selectionHint + ' first, then click ' + (def ? def.name : 'consumable');
             setTimeout(() => { if (state.phase === 'playing') dom.message.textContent = ''; }, 2000);
           }
         } else {
+          const moneyBefore = state.money;
           if (E.useConsumable(state, idx, [])) {
-            showConsumableMessage(def, cons.type);
+            const moneyDiff = state.money - moneyBefore;
+            const extra = moneyDiff > 0 ? '+$' + moneyDiff : (moneyDiff < 0 ? '-$' + Math.abs(moneyDiff) : '');
+            showConsumableMessage(def, cons.type, extra);
             renderGame();
           }
         }
@@ -769,7 +775,18 @@ const Balatro = (() => {
 
         if (canUseHere) {
           el.addEventListener('click', () => {
+            const moneyBefore = state.money;
             E.useConsumable(state, idx, []);
+            const moneyDiff = state.money - moneyBefore;
+            const extra = moneyDiff > 0 ? '+$' + moneyDiff + ' (now $' + state.money + ')' :
+                          moneyDiff < 0 ? '-$' + Math.abs(moneyDiff) : '';
+            // Show brief toast in shop
+            const toast = document.createElement('div');
+            toast.className = 'bal-shop-toast bal-score-anim';
+            toast.innerHTML = '<strong>' + (def ? def.name : 'Used') + '</strong>' +
+              (extra ? ' ' + extra : ' applied');
+            dom.shopInfo.prepend(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2000);
             renderShop();
           });
         }
@@ -922,7 +939,7 @@ const Balatro = (() => {
     }, 1400);
   }
 
-  function showConsumableMessage(def, type) {
+  function showConsumableMessage(def, type, extraInfo) {
     if (!dom.message || !def) return;
     const typeLabel = type === 'planet' ? 'Planet' : type === 'tarot' ? 'Tarot' : 'Spectral';
     dom.message.innerHTML =
@@ -930,16 +947,20 @@ const Balatro = (() => {
         '<span class="cons-msg-type">' + typeLabel + '</span> ' +
         '<span class="cons-msg-name">' + def.name + '</span>' +
         '<div class="cons-msg-desc">' + def.desc + '</div>' +
+        (extraInfo ? '<div class="cons-msg-extra">' + extraInfo + '</div>' : '') +
       '</div>';
-    setTimeout(() => { dom.message.textContent = ''; }, 2000);
+    setTimeout(() => { dom.message.textContent = ''; }, 2200);
   }
 
   function doSkipBlind() {
     const skippedName = D.BLIND_NAMES[state.blind];
+    const moneyBefore = state.money;
     const tag = E.skipBlind(state);
+    const moneyDiff = state.money - moneyBefore;
 
     if (tag) {
-      // Show tag reward notification before advancing
+      const moneyInfo = moneyDiff > 0 ? '<div class="tag-reward-money">+$' + moneyDiff + ' (now $' + state.money + ')</div>' :
+                        moneyDiff < 0 ? '<div class="tag-reward-money">-$' + Math.abs(moneyDiff) + '</div>' : '';
       const container = document.getElementById('bal-blind-options');
       if (container) {
         container.innerHTML =
@@ -947,6 +968,7 @@ const Balatro = (() => {
             '<div class="tag-reward-title">Skipped ' + skippedName + '</div>' +
             '<div class="tag-reward-name">' + tag.name + '</div>' +
             '<div class="tag-reward-desc">' + tag.desc + '</div>' +
+            moneyInfo +
           '</div>';
         setTimeout(() => render(), 1800);
       } else {
